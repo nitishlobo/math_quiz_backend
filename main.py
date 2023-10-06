@@ -1,9 +1,9 @@
 """Main app for math quiz."""
 from fastapi import FastAPI
 
-from routers import multiplication, ping
-from schemas.operands import Operand, Operands
-from services.multiplication import generate_times_table_grid
+from v1.routers import multiplication, ping
+from v1.schemas.operands import Operand, Operands
+from v1.services.multiplication import generate_times_table_grid
 
 # Main app and versions
 main_app = FastAPI()
