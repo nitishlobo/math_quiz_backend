@@ -1,0 +1,2 @@
+fastapi[all]~=0.98
+pydantic~=1.10

@@ -1,0 +1,1 @@
+"""Settings for API router."""
