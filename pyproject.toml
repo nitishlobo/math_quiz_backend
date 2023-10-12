@@ -159,6 +159,10 @@ ignore-patterns = ["^\\.#"]
 # avoid hangs.
 jobs = 0
 
+# List of plugins (as comma separated values of python module names) to load,
+# usually to register additional checkers.
+load-plugins = "pylint_pydantic"
+
 # Minimum Python version to use for version dependent checks. Will default to the
 # version used to run pylint.
 py-version = "3.11"
@@ -174,7 +178,9 @@ good-names = "_, e, i, j, k, v, n, x, y, z, db"
 # List of regular expressions of class ancestor names to ignore when counting
 # public methods (see R0903)
 exclude-too-few-public-methods = """
+    pydantic.*,
     ^.*BaseModel$,
+    ^.*SqlAlchemyBase$,
 """
 min-public-methods = 1
 
@@ -194,6 +200,7 @@ max-line-length = 120
 disable = [
     "logging-fstring-interpolation",    # not applicable for this project
     "wrong-import-order",               # caught by ruff-isort linter
+    "too-few-public-methods",           # exclude-too-few-public-methods setting has bugs (remove once the config works)
 ]
 
 # Enable the message, report, category or checker with the given id(s). You can
