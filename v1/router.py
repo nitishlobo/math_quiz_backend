@@ -30,7 +30,7 @@ class RouteTags(Enum):
     """API route tags that can be used in documentation (e.g. OpenAPI Schema)."""
 
     # Health check
-    PING = "ping"
+    HEALTH_CHECK = "health-check"
 
     # Operations
     MULTIPLICATION = "multiplication"
