@@ -1,10 +1,9 @@
 """Endpoints relating to multiplication operations."""
 from collections.abc import Sequence
 
-from v1.routers.settings.routers import APIRouter
-from v1.routers.settings.tags import RouteTags
-from v1.schemas.operands import Operand, Operands
-from v1.services.multiplication import generate_times_table_grid
+from v1.multiplication.service import generate_times_table_grid
+from v1.operands.schemas import Operand, Operands
+from v1.router import APIRouter, RouteTags
 
 router = APIRouter(prefix="/multiplication", tags=[RouteTags.MULTIPLICATION])
 

@@ -1,4 +1,4 @@
-"""User request schemas."""
+"""User schemas."""
 from uuid import UUID
 
 from pydantic import BaseModel

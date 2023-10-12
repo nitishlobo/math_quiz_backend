@@ -1,4 +1,4 @@
-"""Database settings."""
+"""Global project settings."""
 
 # Database settings
 DEBUG_DATABASE = False

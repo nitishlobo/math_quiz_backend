@@ -1,6 +1,5 @@
 """Health check endpoints."""
-from v1.routers.settings.routers import APIRouter
-from v1.routers.settings.tags import RouteTags
+from v1.router import APIRouter, RouteTags
 
 router = APIRouter(prefix="/ping", tags=[RouteTags.PING])
 

@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql.expression import FunctionElement
 from sqlalchemy.types import DateTime
 
-from v1.database.settings import DATABASE_URL, DEBUG_DATABASE
+from v1.settings import DATABASE_URL, DEBUG_DATABASE
 
 engine = create_engine(DATABASE_URL, echo=DEBUG_DATABASE)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

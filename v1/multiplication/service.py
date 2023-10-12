@@ -1,7 +1,7 @@
 """Services for multiplication."""
 from collections.abc import Sequence
 
-from v1.schemas.operands import Operands
+from v1.operands.schemas import Operands
 
 
 def generate_times_table_grid(operands: Operands) -> Sequence[tuple]:
