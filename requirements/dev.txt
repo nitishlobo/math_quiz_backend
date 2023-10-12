@@ -1,0 +1,2 @@
+pylint~=3.0
+pylint-pydantic==0.3.0
