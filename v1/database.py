@@ -1,10 +1,11 @@
 """Database base functionality."""
+from collections.abc import Generator
 from typing import Any
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.sql.expression import FunctionElement
 from sqlalchemy.types import DateTime
 
@@ -31,3 +32,12 @@ def pg_utcnow(
 ) -> str:
     """Return current UTC time for postgresql database."""
     return "TIMEZONE('utc', CURRENT_TIMESTAMP)"
+
+
+def get_db() -> Generator[Session, Any, Any]:
+    """Database dependency."""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
