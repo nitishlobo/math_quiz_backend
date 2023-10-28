@@ -29,8 +29,6 @@ class APIRouter(FastAPIRouter):
 class RouteTags(Enum):
     """API route tags that can be used in documentation (e.g. OpenAPI Schema)."""
 
-    # Health check
     HEALTH_CHECK = "health-check"
-
-    # Operations
     MULTIPLICATION = "multiplication"
+    USERS = "users"

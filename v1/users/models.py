@@ -1,7 +1,7 @@
 """User database model."""
 import uuid
 
-from sqlalchemy import Column, DateTime, String
+from sqlalchemy import Boolean, Column, DateTime, String
 from sqlalchemy.dialects.postgresql import UUID
 
 from v1.database import SqlAlchemyBase, UtcNow
@@ -17,6 +17,7 @@ class User(SqlAlchemyBase):
     last_name = Column(String)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+    is_superuser = Column(Boolean)
     created = Column(DateTime(timezone=True), server_default=UtcNow())
     updated = Column(DateTime(timezone=True), onupdate=UtcNow())
     deleted = Column(DateTime(timezone=True))

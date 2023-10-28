@@ -93,6 +93,9 @@ unfixable = [
     "RUF100",   # unused-noqa - (buggy, remove yesqa from pre-commit and remove this once it has matured)
 ]
 
+[tool.ruff.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.params.Depends", "fastapi.Query", "fastapi.params.Query"]
+
 [tool.ruff.isort]
 known-first-party = [""]
 known-local-folder = [""]
@@ -110,6 +113,9 @@ classmethod-decorators = ["pydantic.validator"]
 "**/test_*.py" = [
     "INP001",  # Implicit namespace package for tests (tests folder is not a module by design)
     "FBT001",  # Boolean positional arg in function definition (triggers on boolean fixtures)
+]
+"**/router.py" = [
+    "ANN201",  # Missing return type annotation for public function (FastAPI has it's own response_model arg in router decorator)
 ]
 
 [tool.ruff.pycodestyle]
