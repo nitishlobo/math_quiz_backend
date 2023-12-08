@@ -1,2 +1,3 @@
+alembic[tz]~=1.12
 pylint~=3.0
 pylint-pydantic==0.3.0

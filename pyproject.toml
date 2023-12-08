@@ -234,6 +234,9 @@ min-similarity-lines = 4
 # We extend this value to also match our test user fixtures.
 ignored-argument-names = "_.*|^ignored_|^unused_|^test_"
 
+[tool.pylint.typecheck]
+ignored-modules = ["alembic.context", "alembic.op"]
+
 # -------------------------------------------------------------------------------------------------
 # Security
 # -------------------------------------------------------------------------------------------------
