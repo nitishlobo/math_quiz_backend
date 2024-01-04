@@ -5,6 +5,6 @@ router = APIRouter(prefix="/health-check", tags=[RouteTags.HEALTH_CHECK])
 
 
 @router.get("/")
-def health_check() -> dict:
+async def health_check() -> dict:
     """Health check endpoint."""
     return {"message": "Alive and well!"}
