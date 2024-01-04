@@ -106,7 +106,10 @@ classmethod-decorators = ["pydantic.validator"]
 
 [tool.ruff.per-file-ignores]
 "v1/migrations/alembic_models.py" = [
-    "F401"
+    "F401"    # unused-import - alembic uses these imports to know what models to generate and how
+]
+"v1/migrations/versions/*" = [
+    "N999"    # invalid-module-name - migration file names have timestamps
 ]
 
 [tool.ruff.pycodestyle]
@@ -144,7 +147,9 @@ ignore = ["CVS"]
 # ignore-list. The regex matches against paths and can be in Posix or Windows
 # format. Because '\\' represents the directory delimiter on Windows systems, it
 # can't be used as an escape character.
-# ignore-paths =
+ignore-paths = [
+    "v1/migrations*",
+]
 
 # Files or directories matching the regular expression patterns are skipped. The
 # regex matches against base names, not paths. The default value ignores Emacs

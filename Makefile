@@ -20,6 +20,10 @@ help:
 	@echo "  lint                       to run autopep8, ruff, black and other linting tools on staged files"
 	@echo "  lint-all                   to run autopep8, ruff, black and other linting tools on the entire repo"
 	@echo "  run		                to run the FastAPI app locally"
+	@echo "----------------------------"
+	@echo "Commands with args:"
+	@echo "  db-migrate msg='example'   to take all python sqlalchemy models and autogenerates migration files"
+	@echo "      msg                    description of what is being migrated (will be in file name and docstring)"
 
 # Remove all build, test, coverage and python artifacts.
 clean: clean-build clean-pyc clean-lint clean-test
@@ -48,7 +52,10 @@ lint-all:
 run:
 	uvicorn main:main_app --reload
 
-clean-all: clean-build clean-lint clean-pyc clean-test
+# Example of cmd usage:
+# make db-migrate msg="create user table"
+db-migrate:
+	cd v1 && alembic revision --autogenerate -m "$(msg)"
 
 # -------------------------------------------------------------------------------------------------
 # OS specific commands - please uncomment the relevant section depending on your OS
