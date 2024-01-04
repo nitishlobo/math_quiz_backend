@@ -5,6 +5,8 @@
 # General variables
 PYTHON = python3
 VENV_DIR = .venv
+PYTEST_CMD = python -m pytest -vv -rfEsP --maxfail=1 --tb=long --color=yes --code-highlight=yes
+PYTEST_CMD_WITH_THREADING = $(PYTEST_CMD) -n 5
 
 .PHONY: help clean clean-build clean-pyc clean-test test install-lint update-lint lint
 
@@ -42,6 +44,9 @@ help:
 
 run:
 	uvicorn main:main_app --reload
+
+test:
+	$(PYTEST_CMD)
 
 # Remove all build, test, coverage and python artifacts.
 clean: clean-build clean-pyc clean-lint clean-test

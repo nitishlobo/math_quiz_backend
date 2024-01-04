@@ -1,5 +1,6 @@
 """Services shared across the project."""
 from argon2 import PasswordHasher
+from argon2.exceptions import InvalidHashError, VerificationError, VerifyMismatchError
 
 
 def hash_password(password: str) -> str:
@@ -18,4 +19,7 @@ def is_password_correct(password: str, hashed_password: str) -> bool:
     argon2.exceptions.InvalidHashError
         -- raised if hash is so clearly invalid, that it couldn't be passed to Argon2
     """
-    return PasswordHasher().verify(hashed_password, password)
+    try:
+        return PasswordHasher().verify(hashed_password, password)
+    except (InvalidHashError, VerificationError, VerifyMismatchError):
+        return False

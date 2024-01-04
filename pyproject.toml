@@ -78,7 +78,7 @@ ignore = [
     "ARG002",   # unused method argument - covered by pylint unused-argument
     "D207",     # docstring under-indentation
     "D208",     # docstring over-indentation
-    "E501",     # line-too-long (caught by pylint C0301)
+    "E501",     # line-too-long - (caught by pylint C0301)
     "RUF100",   # unused-noqa - (buggy, remove yesqa from pre-commit and remove this once it has matured)
     "SLF001",   # private member access - covered by pylint protected-access
 ]
@@ -106,10 +106,24 @@ classmethod-decorators = ["pydantic.validator"]
 
 [tool.ruff.per-file-ignores]
 "v1/migrations/alembic_models.py" = [
-    "F401"    # unused-import - alembic uses these imports to know what models to generate and how
+    "F401"     # Unused import - alembic uses these imports to know what models to generate and how
 ]
 "v1/migrations/versions/*" = [
-    "N999"    # invalid-module-name - migration file names have timestamps
+    "N999"     # invalid-module-name - migration file names have timestamps
+]
+"conftest.py" = [
+    "F401",    # Unused import
+    "ANN201",  # Return type annotation missing - (pointless in tests)
+    "FBT001",  # Boolean positional arg in function definition - (triggers on boolean fixtures)
+    "INP001",  # Implicit namespace package for conftest - (conftest should live in package root, not a module)
+]
+"**/test_*.py" = [
+    "ANN201",  # Return type annotation missing - (pointless in tests)
+    "INP001",  # Implicit namespace package for tests - (tests folder should not be a module)
+    "FBT001",  # Boolean positional arg in function definition - (triggers on boolean fixtures)
+]
+"**/migrations/versions/*.py" = [
+    "INP001"   # Implicit namespace package for alembic (alembic migrations folder should not be a module)
 ]
 
 [tool.ruff.pycodestyle]
