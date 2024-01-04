@@ -48,6 +48,8 @@ lint-all:
 run:
 	uvicorn main:main_app --reload
 
+clean-all: clean-build clean-lint clean-pyc clean-test
+
 # -------------------------------------------------------------------------------------------------
 # OS specific commands - please uncomment the relevant section depending on your OS
 # -------------------------------------------------------------------------------------------------

@@ -1,1 +1,1 @@
-"""Init file for alembic migrations."""
+"""Alembic migrations init file."""

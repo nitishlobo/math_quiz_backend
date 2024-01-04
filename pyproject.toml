@@ -105,17 +105,8 @@ section-order = ["future", "standard-library", "third-party", "first-party", "lo
 classmethod-decorators = ["pydantic.validator"]
 
 [tool.ruff.per-file-ignores]
-"conftest.py" = [
-    "F401",    # Unused import
-    "FBT001",  # Boolean positional arg in function definition (triggers on boolean fixtures)
-    "INP001",  # Implicit namespace package for conftest (conftest should live in package root, not a module by design)
-]
-"**/test_*.py" = [
-    "INP001",  # Implicit namespace package for tests (tests folder is not a module by design)
-    "FBT001",  # Boolean positional arg in function definition (triggers on boolean fixtures)
-]
-"**/router.py" = [
-    "ANN201",  # Missing return type annotation for public function (FastAPI has it's own response_model arg in router decorator)
+"v1/migrations/alembic_models.py" = [
+    "F401"
 ]
 
 [tool.ruff.pycodestyle]

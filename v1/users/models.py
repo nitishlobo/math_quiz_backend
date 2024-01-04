@@ -12,7 +12,7 @@ class User(SqlAlchemyBase):
 
     __tablename__ = "users"
 
-    id_ = Column(UUID(as_uuid=True), alias="id", primary_key=True, default=uuid.uuid4, index=True)
+    id_ = Column("id", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     first_name = Column(String)
     last_name = Column(String)
     email = Column(String, unique=True, index=True)
