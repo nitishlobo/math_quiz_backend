@@ -217,6 +217,7 @@ disable = [
     "logging-fstring-interpolation",    # not applicable for this project
     "wrong-import-order",               # caught by ruff-isort linter
     "too-few-public-methods",           # exclude-too-few-public-methods setting has bugs (remove once the config works)
+    "fixme",                            # allow # TODO statements
 ]
 
 # Enable the message, report, category or checker with the given id(s). You can

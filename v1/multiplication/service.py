@@ -4,7 +4,8 @@ from collections.abc import Sequence
 from v1.operands.schemas import Operands
 
 
-def generate_times_table_grid(operands: Operands) -> Sequence[tuple]:
+# TODO: split `operands` argument into two arguments - first operator and second operator.
+def generate_times_table_grid(operands: Operands) -> Sequence[tuple[int, int, int]]:
     """Return a list of tuples with each tuple containing operands and the correct solution.
 
     Keywords:
