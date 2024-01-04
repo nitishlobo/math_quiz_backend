@@ -11,4 +11,4 @@ Instructions are for windows machines but they will be similar for linux and mac
 1. Download postgresql v16.1:  
     <https://www.enterprisedb.com/downloads/postgres-postgresql-downloads>
 
-2. On the install postgresql wizard, install the instance on port 5555 (or change port settings in v1/settings.py:DATABASE_URL)
+2. On the install postgresql wizard, install the instance on port 5555 (or change port settings in v1/.env:DATABASE_PORT)

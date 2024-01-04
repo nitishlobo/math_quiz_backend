@@ -9,21 +9,39 @@ VENV_DIR = .venv
 .PHONY: help clean clean-build clean-pyc clean-test test install-lint update-lint lint
 
 help:
-	@echo "Please use 'make <target>' where <target> is one of"
-	@echo "  clean                      to clean build, test, coverage, python artifacts and AWS outputs"
-	@echo "  clean-build                to clean python build artifacts"
-	@echo "  clean-pyc                  to clean python file artifacts"
-	@echo "  clean-test                 to clean python test and coverage artifacts"
-	@echo "  test                       to run unit tests"
-	@echo "  install-lint               to install python linting tools"
-	@echo "  update-lint                to update python linting tools"
-	@echo "  lint                       to run autopep8, ruff, black and other linting tools on staged files"
-	@echo "  lint-all                   to run autopep8, ruff, black and other linting tools on the entire repo"
-	@echo "  run		                to run the FastAPI app locally"
-	@echo "----------------------------"
-	@echo "Commands with args:"
-	@echo "  db-migrate msg='example'   to take all python sqlalchemy models and autogenerates migration files"
-	@echo "      msg                    description of what is being migrated (will be in file name and docstring)"
+	@echo "-----------------------------------------------------------------------------------------------------------"
+	@echo "RUN"
+	@echo "  run                        run the FastAPI app locally"
+	@echo "-----------------------------------------------------------------------------------------------------------"
+	@echo "TEST"
+	@echo "  test                       run unit tests"
+	@echo "-----------------------------------------------------------------------------------------------------------"
+	@echo "LINT"
+	@echo "  install-lint               install python linting tools"
+	@echo "  update-lint                update python linting tools"
+	@echo "  lint                       run autopep8, ruff, black and other linting tools on staged files"
+	@echo "  lint-all                   run autopep8, ruff, black and other linting tools on the entire repo"
+	@echo "-----------------------------------------------------------------------------------------------------------"
+	@echo "CLEAN"
+	@echo "  clean                      clean build, test, coverage, python artifacts and AWS outputs"
+	@echo "  clean-build                clean python build artifacts"
+	@echo "  clean-pyc                  clean python file artifacts"
+	@echo "  clean-lint                 clean python file artifacts"
+	@echo "  clean-test                 clean python test and coverage artifacts"
+	@echo "-----------------------------------------------------------------------------------------------------------"
+	@echo "DATABASE"
+	@echo "  db-current-rev             display the current alembic revision of the database"
+	@echo "  db-upgrade-all             upgrade the database with all the available alembic revisions"
+	@echo "  db-downgrade-all           downgrade the database with all the available alembic revisions"
+	@echo "  db-migrate msg='example'   take all python sqlalchemy models and autogenerates migration files"
+	@echo "      msg                        description of what is being migrated (will be in file name and docstring)"
+	@echo "  db-upgrade rev='ae1'       upgrade the database to a specific revision number"
+	@echo "      rev                        partial/complete revision id of the alembic file or relative integer"
+	@echo "  db-downgrade rev='ae1'     upgrade the database to a specific revision number"
+	@echo "      rev                        partial/complete revision id of the alembic file or relative integer"
+
+run:
+	uvicorn main:main_app --reload
 
 # Remove all build, test, coverage and python artifacts.
 clean: clean-build clean-pyc clean-lint clean-test
@@ -37,7 +55,7 @@ install-lint:
 update-lint:
 	pre-commit autoupdate
 
-# Run pre-commit hooks on all files in repo
+# Run pre-commit hooks on staged files
 # Note: you can run a specific pre-commit by doing:
 # `pre-commit run black`
 # Note: if you want to run ruff (isort module) manually:
@@ -46,16 +64,41 @@ update-lint:
 lint:
 	pre-commit run
 
+# Run pre-commit hooks on entire repo
 lint-all:
 	pre-commit run -a
 
-run:
-	uvicorn main:main_app --reload
+# -------------------------------------------------------------------------------------------------
+# Database commands
+# -------------------------------------------------------------------------------------------------
+db-current-rev:
+	cd v1 && alembic current
 
-# Example of cmd usage:
+db-history:
+	cd v1 && alembic history
+
+# Usage example:
 # make db-migrate msg="create user table"
 db-migrate:
 	cd v1 && alembic revision --autogenerate -m "$(msg)"
+
+db-upgrade-all:
+	cd v1 && alembic upgrade head
+
+# Usage example:
+# make db-upgrade rev="ae1" (upgrade to specific version)
+# make db-upgrade rev="+3" (upgrade relative to current version)
+db-upgrade:
+	cd v1 && alembic upgrade "$(rev)"
+
+db-downgrade-all:
+	cd v1 && alembic downgrade base
+
+# Usage example:
+# make db-downgrade rev="ae1" (downgrade to specific version)
+# make db-downgrade rev="-3" (downgrade relative to current version)
+db-downgrade:
+	cd v1 && alembic downgrade "$(rev)"
 
 # -------------------------------------------------------------------------------------------------
 # OS specific commands - please uncomment the relevant section depending on your OS
