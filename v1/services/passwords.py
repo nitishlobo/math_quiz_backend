@@ -1,4 +1,4 @@
-"""Services shared across the project."""
+"""Services relating to passwords."""
 from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError, VerifyMismatchError
 

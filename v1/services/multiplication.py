@@ -1,7 +1,7 @@
 """Services for multiplication."""
 from collections.abc import Sequence
 
-from v1.operands.schemas import Operands
+from v1.schemas.operands import Operands
 
 
 # TODO: split `operands` argument into two arguments - first operator and second operator.

@@ -4,7 +4,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from v1.migrations.alembic_models import SqlAlchemyBase
+from v1.database.migrations.alembic_models import SqlAlchemyBase
 from v1.settings import DATABASE_URL
 
 # this is the Alembic Config object, which provides

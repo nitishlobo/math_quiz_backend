@@ -4,7 +4,7 @@ import uuid
 from sqlalchemy import Boolean, Column, DateTime, String
 from sqlalchemy.dialects.postgresql import UUID
 
-from v1.database import SqlAlchemyBase, UtcNow
+from v1.database.base import SqlAlchemyBase, UtcNow
 
 
 class User(SqlAlchemyBase):

@@ -10,5 +10,5 @@ https://stackoverflow.com/a/15668175/5702056
 https://stackoverflow.com/a/70890339/5702056
 """
 # pylint: disable=unused-import
-from v1.database import SqlAlchemyBase
-from v1.users.models import User
+from v1.database.base import SqlAlchemyBase
+from v1.database.users import User

@@ -8,6 +8,7 @@ client = TestClient(main_app)
 
 def test_create_user():
     """Test create user."""
+    # TODO: invoke test database instead of real database
     response = client.post(
         f"{v1_router.prefix}/users",
         json={

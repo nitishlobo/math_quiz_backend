@@ -1,7 +1,7 @@
 """Test common module services."""
 import pytest
 
-from v1.common.services import hash_password, is_password_correct
+from v1.services.passwords import hash_password, is_password_correct
 
 
 @pytest.mark.parametrize(

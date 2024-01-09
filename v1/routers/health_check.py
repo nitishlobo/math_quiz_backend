@@ -1,5 +1,5 @@
 """Health check endpoints."""
-from v1.router import APIRouter, RouteTags
+from v1.routers.base import APIRouter, RouteTags
 
 router = APIRouter(prefix="/health-check", tags=[RouteTags.HEALTH_CHECK])
 

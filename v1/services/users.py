@@ -4,9 +4,9 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from v1.common import services as common_services
-from v1.users.models import User
-from v1.users.schemas import CreateUserRequest, UpdateUserRequest
+from v1.database.users import User
+from v1.schemas.users import CreateUserRequest, UpdateUserRequest
+from v1.services import passwords as common_services
 
 
 def create_user(db: Session, user: CreateUserRequest) -> User:
