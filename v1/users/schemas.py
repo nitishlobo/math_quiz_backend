@@ -2,7 +2,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class UserBase(BaseModel):
@@ -27,12 +27,9 @@ class UpdateUserRequest(CreateUserRequest):
 class UserResponse(UserBase):
     """Response model for user."""
 
+    model_config = ConfigDict(from_attributes=True)
+
     id_: UUID = Field(alias="id")
     created: datetime
     updated: datetime
     deleted: datetime
-
-    class Config:
-        """Config for User model."""
-
-        orm_mode = True

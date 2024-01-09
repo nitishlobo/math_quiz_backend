@@ -6,6 +6,7 @@ from v1.health_check.router import router as health_check_router
 from v1.multiplication.router import router as multiplication_router
 from v1.multiplication.service import generate_times_table_grid
 from v1.operands.schemas import Operand, Operands
+from v1.users.router import router as user_router
 
 # Database
 SqlAlchemyBase.metadata.create_all(bind=engine)
@@ -17,6 +18,7 @@ main_app = FastAPI()
 v1_router = APIRouter(prefix="/api/v1")
 v1_router.include_router(health_check_router)
 v1_router.include_router(multiplication_router)
+v1_router.include_router(user_router)
 
 # Main app routes
 main_app.include_router(health_check_router)
