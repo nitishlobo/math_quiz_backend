@@ -33,7 +33,7 @@ async def db_session_middleware(request: Request, call_next: RequestResponseEndp
     try:
         # Create a database session
         with request.state.db_connection as db_connection:
-            db_session_factory = sessionmaker(engine=db_connection.engine, autocommit=False, autoflush=False)
+            db_session_factory = sessionmaker(bind=db_connection.engine, autocommit=False, autoflush=False)
             db_session = scoped_session(session_factory=db_session_factory, scopefunc=get_request_id)
 
         # Attach database session to the request
