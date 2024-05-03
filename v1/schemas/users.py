@@ -20,16 +20,32 @@ class CreateUserRequest(UserBase):
     password: str
 
 
-class UpdateUserRequest(CreateUserRequest):
+class UpdateUserRequest(BaseModel):
     """Request model for updating an existing user."""
+
+    first_name: str | None
+    last_name: str | None
+    email: str | None
+    is_superuser: bool | None = None
+    password: str | None
 
 
 class UserResponse(UserBase):
     """Response model for user."""
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(populate_by_name=True)
 
     id_: UUID = Field(alias="id")
     created: datetime
-    updated: datetime
-    deleted: datetime
+    updated: datetime | None = None
+    deleted: datetime | None = None
+
+
+class UpdateUser(BaseModel):
+    """Service model for updating an existing user."""
+
+    first_name: str | None
+    last_name: str | None
+    email: str | None
+    is_superuser: bool | None = None
+    password: str | None

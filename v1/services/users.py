@@ -4,11 +4,12 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from v1.database.users import User
-from v1.schemas.users import CreateUserRequest, UpdateUserRequest
+from v1.database.models.users import User
+from v1.schemas.users import CreateUserRequest, UpdateUser
 from v1.services import passwords as common_services
 
 
+# @todo remove CreateUserRequest from this service file as this is a view model
 def create_user(db: Session, user: CreateUserRequest) -> User:
     """Return created user."""
     hashed_password = common_services.hash_password(user.password)
@@ -22,7 +23,7 @@ def create_user(db: Session, user: CreateUserRequest) -> User:
 
 def get_user_from_id(db: Session, user_id: UUID) -> User | None:
     """Return user model object from user id."""
-    return db.query(User).filter(User.id == user_id).first()
+    return db.query(User).filter(User.id_ == user_id).first()
 
 
 def get_user_from_email(db: Session, email: str) -> User | None:
@@ -35,9 +36,14 @@ def get_users(db: Session, offset: int = 0, limit: int = 100) -> list[User]:
     return db.query(User).offset(offset).limit(limit).all()
 
 
-def update_user(db: Session, user_id: UUID, user: UpdateUserRequest) -> User | None:
+# @todo remove UpdateUserRequest from this service file as this is a view model
+def update_user(db: Session, user_id: UUID, user: UpdateUser) -> User | None:
     """Return updated user."""
-    db.query(User).filter_by(id_=user_id).update(dict(user))
+    user_data = user.model_dump(exclude={"password"}, exclude_unset=True)
+    if user.password:
+        user_data["hashed_password"] = common_services.hash_password(user.password)
+
+    db.query(User).filter_by(id_=user_id).update(user_data)
     db.commit()
     return get_user_from_id(db, user_id)
 

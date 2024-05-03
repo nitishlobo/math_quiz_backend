@@ -1,15 +1,14 @@
 """Test router for user."""
-from fastapi.testclient import TestClient
 
-from main import main_app, v1_router
+from main import v1_router
 
-client = TestClient(main_app)
+# client = TestClient(main_app)
 
 
-def test_create_user():
+def test_create_user(test_client):
     """Test create user."""
-    # TODO: invoke test database instead of real database
-    response = client.post(
+    # @fix invoke test database instead of real database
+    response = test_client.post(
         f"{v1_router.prefix}/users",
         json={
             "first_name": "Joseph",
@@ -19,5 +18,8 @@ def test_create_user():
             "password": "David@512BC!",
         },
     )
+    from pprint import pprint
+
+    pprint(response.json())
     assert response.status_code == 200
     assert isinstance(response.json(), list)
