@@ -5,9 +5,8 @@ from uuid import UUID
 
 from fastapi import HTTPException
 
-from v1.database.base import DbSession
 from v1.database.models.users import User
-from v1.routers.base import APIRouter, RouteTags
+from v1.routers.base import APIRouter, DbSession, RouteTags
 from v1.schemas.users import CreateUserRequest, UpdateUser, UpdateUserRequest, UserResponse
 from v1.services import users as users_service
 
@@ -15,7 +14,7 @@ router = APIRouter(prefix="/users", tags=[RouteTags.USERS])
 
 
 @router.post("/", response_model=UserResponse)
-def create_user(db_session: DbSession, user: CreateUserRequest):
+def create_user(db_session: DbSession, user: CreateUserRequest) -> User:
     """Return created user."""
     db_user = users_service.get_user_from_email(db_session, user.email)
     if db_user:

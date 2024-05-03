@@ -1,9 +1,12 @@
 """Router related code."""
+
 from collections.abc import Callable
 from enum import Enum
-from typing import Any, Self
+from typing import Annotated, Any, Self
 
 from fastapi import APIRouter as FastAPIRouter
+from fastapi import Depends, Request
+from sqlalchemy.orm.session import Session
 
 
 class APIRouter(FastAPIRouter):
@@ -32,3 +35,11 @@ class RouteTags(Enum):
     HEALTH_CHECK = "health-check"
     MULTIPLICATION = "multiplication"
     USERS = "users"
+
+
+def get_db(request: Request) -> Session:
+    """Return current database session from fastapi request state."""
+    return request.state.db_session  # type: ignore[no-any-return]
+
+
+DbSession = Annotated[Session, Depends(get_db)]

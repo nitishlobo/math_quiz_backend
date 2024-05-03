@@ -1,11 +1,9 @@
 """Database base functionality."""
 
-from typing import Annotated, Any
+from typing import Any
 
-from fastapi import Depends, Request
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.orm import declarative_base
-from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.expression import FunctionElement
 from sqlalchemy.types import DateTime
 
@@ -27,11 +25,3 @@ def pg_utcnow(
 ) -> str:
     """Return current UTC time for postgresql database."""
     return "TIMEZONE('utc', CURRENT_TIMESTAMP)"
-
-
-def get_db(request: Request) -> Session:
-    """Return current database session from fastapi request state."""
-    return request.state.db_session
-
-
-DbSession = Annotated[Session, Depends(get_db)]
