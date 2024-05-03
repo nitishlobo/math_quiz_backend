@@ -12,5 +12,5 @@ router = APIRouter(prefix="/multiplication", tags=[RouteTags.MULTIPLICATION])
 async def create_multiplication_dataset() -> Sequence[tuple[int, int, int]]:
     """Create multiplication dataset."""
     operands = Operands(first=Operand(min_=2, max_=12), second=Operand(min_=1, max_=12))
-    # TODO: Change return data
+    # @fix change return data
     return generate_times_table_grid(operands)
