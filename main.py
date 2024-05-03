@@ -2,8 +2,8 @@
 
 from fastapi import APIRouter, FastAPI
 
-from v1.database.middlewares import db_session_middleware
-from v1.lifespans import lifespans
+from v1.api_infra.lifespans.all import lifespans
+from v1.api_infra.middlewares.database import db_session_middleware
 from v1.routers.health_check import router as health_check_router
 from v1.routers.multiplication import router as multiplication_router
 from v1.routers.users import router as user_router
