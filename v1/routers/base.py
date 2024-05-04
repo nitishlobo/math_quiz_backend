@@ -37,9 +37,9 @@ class RouteTags(Enum):
     USERS = "users"
 
 
-def get_db(request: Request) -> Session:
+def get_db_session(request: Request) -> Session:
     """Return current database session from fastapi request state."""
     return request.state.db_session  # type: ignore[no-any-return]
 
 
-DbSession = Annotated[Session, Depends(get_db)]
+DbSession = Annotated[Session, Depends(get_db_session)]

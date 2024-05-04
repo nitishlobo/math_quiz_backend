@@ -1,4 +1,5 @@
 alembic[tz]~=1.12
+icecream~=2.1
 pre-commit~=3.7
 pylint~=3.0
 pylint-pydantic==0.3.0
