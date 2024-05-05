@@ -6,6 +6,7 @@ https://docs.pytest.org/en/stable/deprecations.html#pytest-plugins-in-non-top-le
 """
 
 pytest_plugins = [
-    "v1.test_fixtures.client",
+    "v1.test_fixtures.clients",
     "v1.test_fixtures.database",
+    "v1.test_fixtures.users",
 ]

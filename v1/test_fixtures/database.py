@@ -10,6 +10,8 @@ from sqlalchemy.orm import Session, scoped_session, sessionmaker
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
 from v1.api_infra.middlewares.database import get_request_id
+from v1.database.base import SqlAlchemyBase
+from v1.database.models.test_factories.users import UserFactory
 from v1.settings import DEBUG_TEST_DATABASE, db_info
 
 
@@ -29,19 +31,28 @@ def fixture_db_connection() -> Generator[Connection, None, None]:
     create_database(url=test_db_info.url)
 
     db_engine = create_engine(url=test_db_info.url, echo=DEBUG_TEST_DATABASE)
-    with db_engine.connect() as db_connection_:
-        yield db_connection_
+
+    # Create all the database tables
+    SqlAlchemyBase.metadata.create_all(db_engine)
+
+    with db_engine.connect() as db_connection:
+        # Create a session
+        db_session_factory = sessionmaker(bind=db_connection.engine, autocommit=False, autoflush=False)
+        db_session = scoped_session(session_factory=db_session_factory, scopefunc=get_request_id)
+        # Attach factories to the current session
+        UserFactory._meta.sqlalchemy_session = db_session  # pylint: disable=protected-access
+        yield db_connection
 
     # Teardown
     drop_database(test_db_info.url)
 
 
-@pytest.fixture(autouse=True)
-def db_session(db_connection: Connection) -> Generator[Session, None, None]:
+@pytest.fixture(autouse=True, name="db_session")
+def fixture_db_session(db_connection: Connection) -> Generator[Session, None, None]:
     """Create a new database session."""
     db_session_factory = sessionmaker(bind=db_connection.engine, autocommit=False, autoflush=False)
-    db_session_ = scoped_session(session_factory=db_session_factory, scopefunc=get_request_id)
+    db_session = scoped_session(session_factory=db_session_factory, scopefunc=get_request_id)
 
-    yield db_session_
+    yield db_session
 
-    db_session_.rollback()
+    db_session.rollback()
