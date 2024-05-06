@@ -6,6 +6,7 @@ from sqlalchemy import MetaData
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.types import DateTime
 
+from v1.database.models.types import ColumnTypes
 from v1.database.wrappers import UtcNow
 
 
@@ -34,5 +35,5 @@ class TimeAudit:
     """
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=UtcNow())
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    deleted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
+    updated_at: Mapped[ColumnTypes.datetime_tz]
+    deleted_at: Mapped[ColumnTypes.datetime_tz | None]
