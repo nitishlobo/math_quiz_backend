@@ -29,9 +29,9 @@ def test_create_user(fastapi_test_client: TestClient, db_session: Session, creat
         "last_name",
         "email",
         "is_superuser",
-        "created",
-        "updated",
-        "deleted",
+        "created_at",
+        "updated_at",
+        "deleted_at",
     }
     response_fields = set(response_data.keys())
     assert response_fields == expected_fields
@@ -46,11 +46,11 @@ def test_create_user(fastapi_test_client: TestClient, db_session: Session, creat
     assert response_data["last_name"] == create_user_request.last_name
     assert response_data["email"] == create_user_request.email
     assert response_data["is_superuser"] is False
-    response_user_created = datetime.fromisoformat(response_data["created"])
+    response_user_created = datetime.fromisoformat(response_data["created_at"])
     assert datetime_before_request < response_user_created
     assert response_user_created < datetime_after_request
-    assert response_data["updated"] == response_data["created"]
-    assert response_data["deleted"] is None
+    assert response_data["updated_at"] == response_data["created_at"]
+    assert response_data["deleted_at"] is None
 
     # Verify information recorded in database is correct
     db_user = db_session.query(User).filter_by(id_=response_data["id"]).first()
@@ -59,6 +59,6 @@ def test_create_user(fastapi_test_client: TestClient, db_session: Session, creat
     assert db_user.last_name == create_user_request.last_name
     assert db_user.email == create_user_request.email
     assert db_user.is_superuser is False
-    assert db_user.created == response_user_created
-    assert db_user.updated == response_user_created
-    assert db_user.deleted is None
+    assert db_user.created_at == response_user_created
+    assert db_user.updated_at == response_user_created
+    assert db_user.deleted_at is None

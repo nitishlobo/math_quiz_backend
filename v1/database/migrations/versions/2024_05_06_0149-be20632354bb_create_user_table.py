@@ -1,8 +1,8 @@
-"""Add trigger function.
+"""create user table.
 
-Revision ID: f1536bc1e759
+Revision ID: be20632354bb
 Revises:
-Create Date: 2024-05-06 01:07:13.803950+00:00
+Create Date: 2024-05-06 01:49:14.195842+00:00
 """
 
 from collections.abc import Sequence
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # Revision identifiers used by Alembic
-revision: str = "f1536bc1e759"
+revision: str = "be20632354bb"
 down_revision: str | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -28,13 +28,13 @@ def upgrade() -> None:
         sa.Column("hashed_password", sa.String(), nullable=False),
         sa.Column("is_superuser", sa.Boolean(), nullable=False),
         sa.Column(
-            "created",
+            "created_at",
             sa.DateTime(timezone=True),
             server_default=sa.text("TIMEZONE('utc', CURRENT_TIMESTAMP)"),
             nullable=False,
         ),
-        sa.Column("updated", sa.DateTime(timezone=True), nullable=False),
-        sa.Column("deleted", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
+        sa.Column("deleted_at", sa.DateTime(timezone=True), nullable=True),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(op.f("ix_users_email"), "users", ["email"], unique=True)
@@ -42,7 +42,7 @@ def upgrade() -> None:
 
     # Manually written code
     op.execute(
-        """CREATE OR REPLACE FUNCTION trigger_function_modify_update_at_datetime_stamp()
+        """CREATE OR REPLACE FUNCTION trigger_function_modify_updated_at()
             RETURNS TRIGGER AS $$
             BEGIN
                 NEW.updated = TIMEZONE('utc', CURRENT_TIMESTAMP);
@@ -52,10 +52,10 @@ def upgrade() -> None:
         """,
     )
     op.execute(
-        """CREATE TRIGGER trigger_modify_update_at_datetime_stamp
+        """CREATE TRIGGER trigger_modify_updated_at
             BEFORE INSERT OR UPDATE ON users
             FOR EACH ROW
-            EXECUTE FUNCTION trigger_function_modify_update_at_datetime_stamp();
+            EXECUTE FUNCTION trigger_function_modify_updated_at();
         """,
     )
 
@@ -67,5 +67,5 @@ def downgrade() -> None:
     op.drop_table("users")
 
     # Manually written code
-    op.execute("DROP TRIGGER IF EXISTS trigger_modify_update_at_datetime_stamp ON users")
-    op.execute("DROP FUNCTION IF EXISTS trigger_function_modify_update_at_datetime_stamp")
+    op.execute("DROP TRIGGER IF EXISTS trigger_modify_updated_at ON users")
+    op.execute("DROP FUNCTION IF EXISTS trigger_function_modify_updated_at")

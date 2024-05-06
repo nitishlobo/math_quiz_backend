@@ -21,29 +21,29 @@ class User(SqlAlchemyBase):
     email: Mapped[str] = mapped_column(String, unique=True, index=True)
     hashed_password: Mapped[str]
     is_superuser: Mapped[bool]
-    created: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=UtcNow())
-    updated: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    deleted: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=UtcNow())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    deleted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
-trigger_function_modify_update_at_datetime_stamp = DDL(
-    """CREATE OR REPLACE FUNCTION trigger_function_modify_update_at_datetime_stamp()
+trigger_function_modify_updated_at = DDL(
+    """CREATE OR REPLACE FUNCTION trigger_function_modify_updated_at()
         RETURNS TRIGGER AS $$
         BEGIN
-            NEW.updated = TIMEZONE('utc', CURRENT_TIMESTAMP);
+            NEW.updated_at = TIMEZONE('utc', CURRENT_TIMESTAMP);
             RETURN NEW;
         END;
         $$ LANGUAGE plpgsql;
     """,
 )
 
-trigger_modify_update_at_datetime_stamp = DDL(
-    """CREATE TRIGGER trigger_modify_update_at_datetime_stamp
+trigger_modify_updated_at = DDL(
+    """CREATE TRIGGER trigger_modify_updated_at
         BEFORE INSERT OR UPDATE ON users
         FOR EACH ROW
-        EXECUTE FUNCTION trigger_function_modify_update_at_datetime_stamp();
+        EXECUTE FUNCTION trigger_function_modify_updated_at();
     """,
 )
 
-event.listen(User.__table__, "after_create", trigger_function_modify_update_at_datetime_stamp)
-event.listen(User.__table__, "after_create", trigger_modify_update_at_datetime_stamp)
+event.listen(User.__table__, "after_create", trigger_function_modify_updated_at)
+event.listen(User.__table__, "after_create", trigger_modify_updated_at)

@@ -1,4 +1,5 @@
 """User schemas."""
+
 from datetime import datetime
 from uuid import UUID
 
@@ -36,9 +37,9 @@ class UserResponse(UserBase):
     model_config = ConfigDict(populate_by_name=True)
 
     id_: UUID = Field(alias="id")
-    created: datetime
-    updated: datetime | None = None
-    deleted: datetime | None = None
+    created_at: datetime
+    updated_at: datetime | None = None
+    deleted_at: datetime | None = None
 
 
 class UpdateUser(BaseModel):
