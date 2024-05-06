@@ -10,8 +10,8 @@ from sqlalchemy.orm import scoped_session
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
 from v1.api_infra.middlewares.database import get_request_id
-from v1.database.base import SqlAlchemyBase
 from v1.database.connections import create_db_session
+from v1.database.models.base import SqlAlchemyBase
 from v1.database.models.test_factories.users import UserFactory
 from v1.settings import DEBUG_TEST_DATABASE, db_info
 

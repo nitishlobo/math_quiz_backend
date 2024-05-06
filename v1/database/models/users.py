@@ -1,16 +1,15 @@
 """User database model."""
 
 import uuid
-from datetime import datetime
 
-from sqlalchemy import DDL, DateTime, String, event
+from sqlalchemy import String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
-from v1.database.base import SqlAlchemyBase, UtcNow
+from v1.database.models.base import SqlAlchemyBase, TimeAudit
 
 
-class User(SqlAlchemyBase):
+class User(SqlAlchemyBase, TimeAudit):
     """User database model."""
 
     __tablename__ = "users"
@@ -21,29 +20,3 @@ class User(SqlAlchemyBase):
     email: Mapped[str] = mapped_column(String, unique=True, index=True)
     hashed_password: Mapped[str]
     is_superuser: Mapped[bool]
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=UtcNow())
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    deleted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
-
-
-trigger_function__modify_updated_at_to_current_timestamp = DDL(
-    """CREATE OR REPLACE FUNCTION trigger_function__modify_updated_at_to_current_timestamp()
-        RETURNS TRIGGER AS $$
-        BEGIN
-            NEW.updated_at = TIMEZONE('utc', CURRENT_TIMESTAMP);
-            RETURN NEW;
-        END;
-        $$ LANGUAGE plpgsql;
-    """,
-)
-
-trigger__modify_updated_at_to_current_timestamp = DDL(
-    """CREATE TRIGGER trigger__modify_updated_at_to_current_timestamp
-        BEFORE INSERT OR UPDATE ON users
-        FOR EACH ROW
-        EXECUTE FUNCTION trigger_function__modify_updated_at_to_current_timestamp();
-    """,
-)
-
-event.listen(User.__table__, "after_create", trigger_function__modify_updated_at_to_current_timestamp)
-event.listen(User.__table__, "after_create", trigger__modify_updated_at_to_current_timestamp)

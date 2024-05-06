@@ -1,1 +1,1 @@
-"""Database models."""
+"""Database models, migrations and triggers."""

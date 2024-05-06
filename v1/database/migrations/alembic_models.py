@@ -9,6 +9,7 @@ Refer to the following for more information:
 https://stackoverflow.com/a/15668175/5702056
 https://stackoverflow.com/a/70890339/5702056
 """
+
 # pylint: disable=unused-import
-from v1.database.base import SqlAlchemyBase
+from v1.database.models.base import SqlAlchemyBase
 from v1.database.models.users import User
