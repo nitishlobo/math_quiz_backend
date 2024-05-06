@@ -4,5 +4,6 @@ psycopg2~=2.9.9
 pydantic~=2.4
 python-dotenv~=1.0
 SQLAlchemy~=2.0
+tzdata==2024.1
 # Uvicorn v0.29.0 has a broken functionality for hot reloading the app
 uvicorn==0.21.0

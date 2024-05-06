@@ -3,11 +3,13 @@
 from typing import Any
 
 from sqlalchemy.ext.compiler import compiles
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.sql.expression import FunctionElement
 from sqlalchemy.types import DateTime
 
-SqlAlchemyBase = declarative_base()
+
+class SqlAlchemyBase(DeclarativeBase):
+    """Base SQL alchemy model."""
 
 
 class UtcNow(FunctionElement):  # pylint: disable=too-many-ancestors, abstract-method
