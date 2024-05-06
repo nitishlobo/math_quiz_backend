@@ -9,8 +9,9 @@ from typing import Final
 from uuid import uuid1
 
 from fastapi import Request, Response
-from sqlalchemy.orm import scoped_session, sessionmaker
 from starlette.middleware.base import RequestResponseEndpoint
+
+from v1.database.connections import create_db_session
 
 REQUEST_ID_CTX_KEY: Final[str] = "request_id"
 _request_id_ctx_var: ContextVar[str | None] = ContextVar(REQUEST_ID_CTX_KEY, default=None)
@@ -33,8 +34,7 @@ async def db_session_middleware(request: Request, call_next: RequestResponseEndp
     try:
         # Create a database session
         with request.app.state.db_connection as db_connection:
-            db_session_factory = sessionmaker(bind=db_connection.engine, autocommit=False, autoflush=False)
-            db_session = scoped_session(session_factory=db_session_factory, scopefunc=get_request_id)
+            db_session = create_db_session(db_engine=db_connection.engine, scoped_session_func=get_request_id)
 
         # Attach database session to the request
         request.state.db_session = db_session
