@@ -24,7 +24,12 @@ class SqlAlchemyBase(DeclarativeBase):
 
 
 class TimeAudit:
-    """Datetime-with-timezone-stamp fields used for auditing tables."""
+    """Datetime-with-timezone-stamp fields used for auditing tables.
+
+    For every database table that has the columns defined in this class,
+    the updated_at column will have a trigger before insert and update to update the field to the current timestamp.
+    See the `triggers` module in this project for execution details.
+    """
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=UtcNow())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
