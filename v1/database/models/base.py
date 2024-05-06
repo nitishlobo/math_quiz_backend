@@ -13,6 +13,8 @@ class SqlAlchemyBase(DeclarativeBase):
     """Base SQL alchemy model."""
 
     metadata = MetaData(
+        # The following shortforms stand for the following constraints
+        # ix=index, uq=unique, ck=check, fk=foreign key, pk=primary key
         naming_convention={
             "ix": "ix_%(column_0_N_label)s",
             "uq": "uq_%(table_name)s_%(column_0_N_name)s",
