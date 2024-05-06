@@ -1,10 +1,13 @@
 """General helper functions and classes."""
 
+from typing import get_type_hints
+
 
 def get_class_variables(cls: type) -> set[str]:
-    """Return set of class variables."""
-    # Get class attributes
-    attributes = vars(cls)
+    """Return set of class field names.
 
-    # Filter out methods, nested classes and dunder (__) attributes
-    return {key for key, value in attributes.items() if not callable(value) and not key.startswith("__")}
+    Keyword args:
+    cls -- class or instance of a class
+    """
+    class_annotations = get_type_hints(cls)
+    return set(class_annotations.keys())
