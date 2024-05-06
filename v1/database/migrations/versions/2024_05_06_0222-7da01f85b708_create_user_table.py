@@ -1,8 +1,8 @@
-"""create user table.
+"""Create user table.
 
-Revision ID: be20632354bb
+Revision ID: 7da01f85b708
 Revises:
-Create Date: 2024-05-06 01:49:14.195842+00:00
+Create Date: 2024-05-06 02:22:36.863036+00:00
 """
 
 from collections.abc import Sequence
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # Revision identifiers used by Alembic
-revision: str = "be20632354bb"
+revision: str = "7da01f85b708"
 down_revision: str | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -35,14 +35,14 @@ def upgrade() -> None:
         ),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("deleted_at", sa.DateTime(timezone=True), nullable=True),
-        sa.PrimaryKeyConstraint("id"),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_users")),
     )
     op.create_index(op.f("ix_users_email"), "users", ["email"], unique=True)
     op.create_index(op.f("ix_users_id"), "users", ["id"], unique=False)
 
     # Manually written code
     op.execute(
-        """CREATE OR REPLACE FUNCTION trigger_function_modify_updated_at()
+        """CREATE OR REPLACE FUNCTION trigger_function__modify_updated_at_to_current_timestamp()
             RETURNS TRIGGER AS $$
             BEGIN
                 NEW.updated = TIMEZONE('utc', CURRENT_TIMESTAMP);
@@ -52,10 +52,10 @@ def upgrade() -> None:
         """,
     )
     op.execute(
-        """CREATE TRIGGER trigger_modify_updated_at
+        """CREATE TRIGGER trigger__modify_updated_at_to_current_timestamp
             BEFORE INSERT OR UPDATE ON users
             FOR EACH ROW
-            EXECUTE FUNCTION trigger_function_modify_updated_at();
+            EXECUTE FUNCTION trigger_function__modify_updated_at_to_current_timestamp();
         """,
     )
 
@@ -67,5 +67,5 @@ def downgrade() -> None:
     op.drop_table("users")
 
     # Manually written code
-    op.execute("DROP TRIGGER IF EXISTS trigger_modify_updated_at ON users")
-    op.execute("DROP FUNCTION IF EXISTS trigger_function_modify_updated_at")
+    op.execute("DROP TRIGGER IF EXISTS trigger__modify_updated_at_to_current_timestamp ON users")
+    op.execute("DROP FUNCTION IF EXISTS trigger_function__modify_updated_at_to_current_timestamp")

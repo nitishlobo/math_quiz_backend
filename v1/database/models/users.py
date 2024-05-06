@@ -26,8 +26,8 @@ class User(SqlAlchemyBase):
     deleted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
-trigger_function_modify_updated_at = DDL(
-    """CREATE OR REPLACE FUNCTION trigger_function_modify_updated_at()
+trigger_function__modify_updated_at_to_current_timestamp = DDL(
+    """CREATE OR REPLACE FUNCTION trigger_function__modify_updated_at_to_current_timestamp()
         RETURNS TRIGGER AS $$
         BEGIN
             NEW.updated_at = TIMEZONE('utc', CURRENT_TIMESTAMP);
@@ -37,13 +37,13 @@ trigger_function_modify_updated_at = DDL(
     """,
 )
 
-trigger_modify_updated_at = DDL(
-    """CREATE TRIGGER trigger_modify_updated_at
+trigger__modify_updated_at_to_current_timestamp = DDL(
+    """CREATE TRIGGER trigger__modify_updated_at_to_current_timestamp
         BEFORE INSERT OR UPDATE ON users
         FOR EACH ROW
-        EXECUTE FUNCTION trigger_function_modify_updated_at();
+        EXECUTE FUNCTION trigger_function__modify_updated_at_to_current_timestamp();
     """,
 )
 
-event.listen(User.__table__, "after_create", trigger_function_modify_updated_at)
-event.listen(User.__table__, "after_create", trigger_modify_updated_at)
+event.listen(User.__table__, "after_create", trigger_function__modify_updated_at_to_current_timestamp)
+event.listen(User.__table__, "after_create", trigger__modify_updated_at_to_current_timestamp)
