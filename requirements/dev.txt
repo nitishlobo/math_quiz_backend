@@ -1,3 +1,4 @@
+-r prod.txt
 alembic[tz]~=1.12
 icecream~=2.1
 pre-commit~=3.7
