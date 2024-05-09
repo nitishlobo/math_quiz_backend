@@ -12,7 +12,7 @@ from v1.database.models.types import ColumnTypes
 from v1.database.triggers.functions import trigger_function_modify_updated_at_to_current_timestamp
 from v1.database.triggers.triggers import trigger_modify_updated_at_to_current_timestamp
 from v1.database.wrappers import UtcNow
-from v1.utils import get_class_variables
+from v1.utils.utils import get_class_variables
 
 
 class SqlAlchemyBase(DeclarativeBase):

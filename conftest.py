@@ -9,4 +9,5 @@ pytest_plugins = [
     "v1.test_fixtures.clients",
     "v1.test_fixtures.database",
     "v1.test_fixtures.users",
+    "v1.test_fixtures.classes",
 ]
