@@ -46,7 +46,7 @@ run:
 	uvicorn main:main_app --reload
 
 test:
-	$(PYTEST_CMD)
+	pytest
 
 # Remove all build, test, coverage and python artifacts.
 clean: clean-build clean-pyc clean-lint clean-test

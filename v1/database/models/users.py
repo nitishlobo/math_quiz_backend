@@ -1,6 +1,5 @@
 """User database model."""
 
-from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from v1.database.models.base import SqlAlchemyBase, TimeAudit
@@ -12,9 +11,9 @@ class User(SqlAlchemyBase, TimeAudit):
 
     __tablename__ = "users"
 
-    id_: Mapped[ColumnTypes.id_pk]
+    id_: Mapped[ColumnTypes.id_pk] = mapped_column(name="id")
     first_name: Mapped[str]
     last_name: Mapped[str]
-    email: Mapped[str] = mapped_column(String, unique=True, index=True)
+    email: Mapped[str] = mapped_column(unique=True, index=True)
     hashed_password: Mapped[str]
     is_superuser: Mapped[bool]
