@@ -258,3 +258,15 @@ exclude_dirs = ["tests"]
 
 [tool.bandit.assert_used]
 skips = ["*_test.py", "*/test_*.py", "**/conftest.py"]
+
+# -------------------------------------------------------------------------------------------------
+# Testing
+# -------------------------------------------------------------------------------------------------
+
+[tool.pytest.ini_options]
+addopts = "-vv -rfEsP --tb=long --color=yes --code-highlight=yes"
+filterwarnings = [
+    # Warning from httpx library that FastAPI has not patched just yet
+    # For more info, see: https://github.com/tiangolo/fastapi/discussions/6211#discussioncomment-8815439
+    'ignore:The .app. shortcut is now deprecated\. Use the explicit style .transport=WSGITransport\(app=\.\.\.\). instead\.:DeprecationWarning'
+]
