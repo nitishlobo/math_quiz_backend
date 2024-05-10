@@ -7,7 +7,6 @@ on:
   pull_request:
 
 env:
-  OS: "ubuntu-latest"
   PYTHON_VERSION: "3.11"
   POSTGRES_DATABASE_NAME: "math_quiz"
 
@@ -17,7 +16,7 @@ permissions:
 jobs:
   run-tests:
     name: Test
-    runs-on: ${{ env.OS }}
+    runs-on: ubuntu-latest
     services:
       postgres:
         # Docker Hub PostgreSQL image
@@ -66,7 +65,7 @@ jobs:
 
   lint:
     name: Lint
-    runs-on: ${{ env.OS }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
