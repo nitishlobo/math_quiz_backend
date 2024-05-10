@@ -1,0 +1,74 @@
+# Trigger this workflow on every pull request
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: CI
+
+on:
+  pull_request:
+
+env:
+  PYTHON_VERSION: "3.11"
+  POSTGRES_DATABASE_NAME: "math_quiz"
+
+permissions:
+  contents: read
+
+jobs:
+  run-tests:
+    name: Test
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        # Docker Hub PostgreSQL image
+        image: postgres
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DATABASE_NAME }}
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          pip install uv
+          uv venv
+          source .venv/bin/activate
+          uv pip install -r requirements/test.txt
+
+      - name: Run tests
+        env:
+          DATABASE_TYPE: postgresql
+          DATABASE_USER: postgres
+          DATABASE_PASSWORD: postgres
+          DATABASE_HOST: localhost
+          DATABASE_PORT: 5432
+          DATABASE_NAME: ${{ env.POSTGRES_DATABASE_NAME }}
+          DEBUG_DATABASE: False
+          DEBUG_TEST_DATABASE: False
+        run: |
+          source .venv/bin/activate
+          pytest
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run linting
+        uses: chartboost/ruff-action@v1
