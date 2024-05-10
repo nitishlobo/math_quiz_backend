@@ -6,13 +6,17 @@ name: CI
 on:
   pull_request:
 
+env:
+  OS: ubuntu_latest
+  PYTHON_VERSION: 3.11
+
 permissions:
   contents: read
 
 jobs:
   run-tests:
     name: Test
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.OS }}
     services:
       postgres:
         # Docker Hub PostgreSQL image
@@ -36,7 +40,7 @@ jobs:
       - name: Setup python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install dependencies
         run: |
@@ -59,17 +63,12 @@ jobs:
           source .venv/bin/activate
           pytest
 
-  lint:
+  run-linting:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: ${{ env.OS }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Setup python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
 
       - name: Run linting
         uses: chartboost/ruff-action@v1
