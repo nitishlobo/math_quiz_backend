@@ -46,6 +46,18 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
 
+    env:
+      DATABASE_TYPE: postgresql
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_HOST: localhost
+      DATABASE_PORT: 5432
+      DATABASE_NAME: math_quiz
+      DEBUG_DATABASE: False
+      DEBUG_TEST_DATABASE: False
+      POSTGRES_DB: math_quiz
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
