@@ -17,19 +17,6 @@ jobs:
       postgres:
         # Docker Hub PostgreSQL image
         image: postgres
-        # Provide the password for postgres
-        env:
-          DATABASE_TYPE: postgresql
-          DATABASE_USER: postgres
-          DATABASE_PASSWORD: postgres
-          DATABASE_HOST: localhost
-          DATABASE_PORT: 5432
-          DATABASE_NAME: math_quiz
-          DEBUG_DATABASE: False
-          DEBUG_TEST_DATABASE: False
-          POSTGRES_DB: math_quiz
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -67,7 +54,8 @@ jobs:
         run: pytest
 
   lint:
-    runs-on: [ubuntu-latest, macos-latest, windows-latest]
+    name: Lint
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
