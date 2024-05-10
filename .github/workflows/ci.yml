@@ -34,6 +34,9 @@ jobs:
           DATABASE_NAME: math_quiz
           DEBUG_DATABASE: False
           DEBUG_TEST_DATABASE: False
+          POSTGRES_DB: math_quiz
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
