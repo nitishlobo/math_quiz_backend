@@ -38,11 +38,12 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install uv for faster installation of dependencies
-        run: pip install uv
-
       - name: Install dependencies
-        run: uv pip install -r requirements/test.txt
+        run: |
+          pip install uv
+          uv venv
+          source .venv/bin/activate
+          uv pip install -r requirements/test.txt
 
       - name: Run tests
         env:
@@ -68,11 +69,5 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install uv for faster installation of dependencies
-        run: pip install uv
-
-      - name: Install dependencies
-        run: uv pip install -r requirements/dev.txt
-
       - name: Run linting
-        run: ruff .
+        uses: chartboost/ruff-action@v1
