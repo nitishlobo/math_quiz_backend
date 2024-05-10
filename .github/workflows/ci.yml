@@ -7,7 +7,7 @@ on:
   pull_request:
 
 env:
-  OS: ubuntu-latest
+  OS: "ubuntu-latest"
   PYTHON_VERSION: "3.11"
   POSTGRES_DATABASE_NAME: "math_quiz"
 
