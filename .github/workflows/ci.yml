@@ -29,16 +29,6 @@ jobs:
         ports:
           - 5432:5432
 
-    env:
-      DATABASE_TYPE: postgresql
-      DATABASE_USER: postgres
-      DATABASE_PASSWORD: postgres
-      DATABASE_HOST: localhost
-      DATABASE_PORT: 5432
-      DATABASE_NAME: math_quiz
-      DEBUG_DATABASE: False
-      DEBUG_TEST_DATABASE: False
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -52,6 +42,15 @@ jobs:
         run: pip install -r requirements/test.txt
 
       - name: Run tests
+        env:
+          DATABASE_TYPE: postgresql
+          DATABASE_USER: postgres
+          DATABASE_PASSWORD: postgres
+          DATABASE_HOST: localhost
+          DATABASE_PORT: 5432
+          DATABASE_NAME: math_quiz
+          DEBUG_DATABASE: False
+          DEBUG_TEST_DATABASE: False
         run: pytest
 
   lint:
