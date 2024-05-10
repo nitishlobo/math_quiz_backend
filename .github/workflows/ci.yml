@@ -8,7 +8,6 @@ on:
 
 env:
   PYTHON_VERSION: "3.11"
-  POSTGRES_DATABASE_PORT: "5432"
 
 permissions:
   contents: read
@@ -31,7 +30,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
         ports:
-          - ${{ env.POSTGRES_DATABASE_PORT }}:${{ env.POSTGRES_DATABASE_PORT }}
+          - 5432:5432
 
     steps:
       - name: Checkout code
@@ -55,7 +54,7 @@ jobs:
           DATABASE_USER: postgres
           DATABASE_PASSWORD: postgres
           DATABASE_HOST: localhost
-          DATABASE_PORT: ${{ env.POSTGRES_DATABASE_PORT }}
+          DATABASE_PORT: 5432
           DATABASE_NAME: math_quiz
           DEBUG_DATABASE: False
           DEBUG_TEST_DATABASE: False
