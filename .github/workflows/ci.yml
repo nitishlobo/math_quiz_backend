@@ -9,6 +9,8 @@ on:
 env:
   OS: ubuntu_latest
   PYTHON_VERSION: 3.11
+  POSTGRES_DATABASE_NAME: math_quiz
+  POSTGRES_DATABASE_PORT: 5432
 
 permissions:
   contents: read
@@ -22,7 +24,7 @@ jobs:
         # Docker Hub PostgreSQL image
         image: postgres
         env:
-          POSTGRES_DB: math_quiz
+          POSTGRES_DB: ${{ env.POSTGRES_DATABASE_NAME }}
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
         options: >-
@@ -31,7 +33,8 @@ jobs:
           --health-timeout 5s
           --health-retries 5
         ports:
-          - 5432:5432
+          # Map tcp port 5432 on service container to the host
+          - ${{ env.POSTGRES_DATABASE_PORT }}:${{ env.POSTGRES_DATABASE_PORT }}
 
     steps:
       - name: Checkout code
@@ -55,8 +58,8 @@ jobs:
           DATABASE_USER: postgres
           DATABASE_PASSWORD: postgres
           DATABASE_HOST: localhost
-          DATABASE_PORT: 5432
-          DATABASE_NAME: math_quiz
+          DATABASE_PORT: ${{ env.POSTGRES_DATABASE_PORT }}
+          DATABASE_NAME: ${{ env.POSTGRES_DATABASE_NAME }}
           DEBUG_DATABASE: False
           DEBUG_TEST_DATABASE: False
         run: |
