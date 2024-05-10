@@ -8,6 +8,7 @@ on:
 
 env:
   PYTHON_VERSION: "3.11"
+  POSTGRES_DATABASE_NAME: "math_quiz"
 
 permissions:
   contents: read
@@ -21,7 +22,7 @@ jobs:
         # Docker Hub PostgreSQL image
         image: postgres
         env:
-          POSTGRES_DB: math_quiz
+          POSTGRES_DB: ${{ env.POSTGRES_DATABASE_NAME }}
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
         options: >-
@@ -55,7 +56,7 @@ jobs:
           DATABASE_PASSWORD: postgres
           DATABASE_HOST: localhost
           DATABASE_PORT: 5432
-          DATABASE_NAME: math_quiz
+          DATABASE_NAME: ${{ env.POSTGRES_DATABASE_NAME }}
           DEBUG_DATABASE: False
           DEBUG_TEST_DATABASE: False
         run: |
