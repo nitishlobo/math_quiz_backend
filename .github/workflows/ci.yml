@@ -26,8 +26,14 @@ jobs:
         image: postgres
         # Provide the password for postgres
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          DATABASE_TYPE: postgresql
+          DATABASE_USER: postgres
+          DATABASE_PASSWORD: postgres
+          DATABASE_HOST: localhost
+          DATABASE_PORT: 5432
+          DATABASE_NAME: math_quiz
+          DEBUG_DATABASE: False
+          DEBUG_TEST_DATABASE: False
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -37,8 +43,6 @@ jobs:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
 
-    env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/math-quiz
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
