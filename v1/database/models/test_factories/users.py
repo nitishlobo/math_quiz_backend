@@ -18,12 +18,11 @@ class UserFactory(BaseFactory):
     email = "john.francesco@gmail.com"
     hashed_password = PasswordHasher().hash("MyNotSecurePassword123!")
     is_superuser = False
-    created = datetime(2024, 5, 29, 1, 6, 40, 336080, tzinfo=timezone.utc)
-    updated = None
-    deleted = None
+    created_at = datetime(2024, 5, 29, 1, 6, 40, 336080, tzinfo=timezone.utc)
+    updated_at = None
+    deleted_at = None
 
     class Meta:
         """Factory boy metadata."""
 
-        abstract = True
         model = User

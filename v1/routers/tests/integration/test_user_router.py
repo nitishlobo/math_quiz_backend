@@ -12,7 +12,7 @@ from v1.schemas.users import CreateUserRequest
 
 
 def test_create_user(fastapi_test_client: TestClient, db_session: Session, create_user_request: CreateUserRequest):
-    """Test create user."""
+    """Test create user route and response."""
     datetime_before_request = datetime.now(timezone.utc)
     response = fastapi_test_client.post(f"{v1_router.prefix}/users", json=create_user_request.model_dump())
     datetime_after_request = datetime.now(timezone.utc)
