@@ -1,4 +1,5 @@
 """Users service."""
+
 from datetime import datetime, timezone
 from uuid import UUID
 
@@ -15,8 +16,9 @@ def create_user(db: Session, user: CreateUserRequest) -> User:
     hashed_password = common_services.hash_password(user.password)
     db_user = User(hashed_password=hashed_password, **user.model_dump(exclude={"password"}))
     db.add(db_user)
-    db.commit()
-    # Refresh to get id
+    # Flush to make User persistent in this session and get id and created_at.
+    db.flush()
+    # Refresh to get `updated_at` field in db_user model.
     db.refresh(db_user)
     return db_user
 
