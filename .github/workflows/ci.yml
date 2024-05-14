@@ -96,7 +96,6 @@ jobs:
         run: |
           echo "Coverage Percantage - ${{ steps.coverageComment.outputs.coverage }}"
           echo "Coverage Color - ${{ steps.coverageComment.outputs.color }}"
-          echo "Summary Report - ${{ steps.coverageComment.outputs.summaryReport }}"
 
           echo "Coverage Warnings - ${{ steps.coverageComment.outputs.warnings }}"
 
