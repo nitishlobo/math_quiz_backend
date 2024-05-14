@@ -1,5 +1,6 @@
 """Test module for user router."""
 
+
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
@@ -7,6 +8,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
 from main import v1_router
+from v1.database.models.test_factories.users import UserFactory
 from v1.database.models.users import User
 from v1.schemas.users import CreateUserRequest
 
@@ -80,3 +82,24 @@ def test_create_same_user_as_above_test_is_possible(
     response_data = response.json()
     assert response.status_code == 200
     assert isinstance(response_data, dict)
+
+
+def test_create_user_who_already_exists_fails(
+    fastapi_test_client: TestClient,
+    db_session: Session,
+    create_user_request: CreateUserRequest,
+):
+    """Test that given a user already exists, they cannot be created again."""
+    user = create_user_request.model_dump()
+
+    # Create the user in the database
+    UserFactory(**user)
+    db_session.commit()
+
+    # Try to create the user again
+    response = fastapi_test_client.post(f"{v1_router.prefix}/users", json=user)
+
+    # Verify response status and type
+    response_data = response.json()
+    assert response.status_code == 400
+    assert response_data == {"detail": "Email already registered"}

@@ -18,6 +18,7 @@ def create_user(db_session: DbSession, user: CreateUserRequest) -> User:
     """Return created user."""
     db_user = users_service.get_user_from_email(db_session, user.email)
     if db_user:
+        # @todo create a custom exception for this
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Email already registered")
     return users_service.create_user(db_session, user)
 
