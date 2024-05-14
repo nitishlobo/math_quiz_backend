@@ -79,6 +79,21 @@ jobs:
     name: Test coverage
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          pip install uv
+          uv venv
+          source .venv/bin/activate
+          uv pip install -r requirements/test.txt
+
       - name: Build coverage file
         run: |
           pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=app tests/ | tee pytest-coverage.txt
