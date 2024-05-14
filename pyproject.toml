@@ -264,7 +264,7 @@ skips = ["*_test.py", "*/test_*.py", "**/conftest.py"]
 # -------------------------------------------------------------------------------------------------
 
 [tool.pytest.ini_options]
-addopts = "-vv -rfEsP --tb=long --color=yes --code-highlight=yes"
+addopts = "-vv -rfEsP --tb=long --color=yes --code-highlight=yes --cov=. --cov-report html"
 filterwarnings = [
     # Warning from httpx library that FastAPI has not patched just yet
     # For more info, see: https://github.com/tiangolo/fastapi/discussions/6211#discussioncomment-8815439
