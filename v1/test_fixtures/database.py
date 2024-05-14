@@ -4,7 +4,6 @@ Based on: https://stackoverflow.com/a/67348153/5702056
 """
 
 import importlib
-import inspect
 import pkgutil
 from collections.abc import Generator
 from uuid import uuid4
@@ -26,20 +25,14 @@ TestingDbSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=tes
 
 def get_database_model_factories() -> list[type(BaseFactory)]:
     """Return a list of factories for database models."""
-    factory_models = []
     package = "v1.database.models.test_factories"
 
     # Iterate through all modules in the test_factories package and load these modules
     for _importer, modname, _ispkg in pkgutil.iter_modules(importlib.import_module(package).__path__):
         full_module_name = f"{package}.{modname}"
-        module = importlib.import_module(full_module_name)
+        importlib.import_module(full_module_name)
 
-        # Iterate through all members of the module
-        for _name, obj in inspect.getmembers(module, inspect.isclass):
-            if issubclass(obj, BaseFactory) and obj is not BaseFactory:
-                factory_models.append(obj)
-
-    return factory_models
+    return BaseFactory.__subclasses__()
 
 
 def add_database_model_factories_to_db_session(provided_db_session: Session) -> None:
