@@ -125,7 +125,8 @@ clean-pyc:
 
 # Remove test and coverage artifacts
 clean-test:
-	for /d /r %%p in (.pytest_cache) do  @if exist "%%p" rmdir /s /q "%%p"
+	for /d /r %%p in (.pytest_cache, htmlcov) do  @if exist "%%p" rmdir /s /q "%%p"
+	for /d /r %%p in (.coverage) do  @if exist "%%p" del /s /f /q "%%p"
 
 # -------------------------------------------------------------------------------------------------
 # MacOS / Linux

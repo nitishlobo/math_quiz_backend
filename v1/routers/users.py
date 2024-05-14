@@ -1,11 +1,9 @@
 """User endpoints."""
 
-from http import HTTPStatus
 from uuid import UUID
 
-from fastapi import HTTPException
-
 from v1.database.models.users import User
+from v1.exceptions.users import UserAlreadyExistsError
 from v1.routers.base import APIRouter, DbSession, RouteTags
 from v1.schemas.users import CreateUserRequest, UpdateUser, UpdateUserRequest, UserResponse
 from v1.services import users as users_service
@@ -18,8 +16,7 @@ def create_user(db_session: DbSession, user: CreateUserRequest) -> User:
     """Return created user."""
     db_user = users_service.get_user_from_email(db_session, user.email)
     if db_user:
-        # @todo create a custom exception for this
-        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail="Email already registered")
+        raise UserAlreadyExistsError(email=user.email)
     return users_service.create_user(db_session, user)
 
 
