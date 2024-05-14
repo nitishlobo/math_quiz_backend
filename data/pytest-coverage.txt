@@ -1,0 +1,72 @@
+[1m=================================================================== test session starts ===================================================================[0m
+platform win32 -- Python 3.11.4, pytest-7.4.4, pluggy-1.5.0 -- C:\Users\nitish\all\innovation\math_quiz_backend\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\nitish\all\innovation\math_quiz_backend
+configfile: pyproject.toml
+plugins: anyio-3.7.1, Faker-25.0.1, cov-5.0.0, mock-3.14.0
+[1mcollecting ... [0mcollected 39 items
+
+v1/routers/tests/integration/test_health_check_router.py::test_health_check_for_main_app [32mPASSED[0m[32m                                                      [  2%][0m
+v1/routers/tests/integration/test_health_check_router.py::test_health_check_for_app_v1 [32mPASSED[0m[32m                                                        [  5%][0m
+v1/routers/tests/integration/test_user_router.py::test_create_user [32mPASSED[0m[32m                                                                            [  7%][0m
+v1/routers/tests/integration/test_user_router.py::test_create_same_user_as_above_test_is_possible [32mPASSED[0m[32m                                             [ 10%][0m
+v1/services/tests/test_passwords.py::test_hash_password[MyPassword37!] [32mPASSED[0m[32m                                                                        [ 12%][0m
+v1/services/tests/test_passwords.py::test_hash_password[=TopSecRET42] [32mPASSED[0m[32m                                                                         [ 15%][0m
+v1/services/tests/test_passwords.py::test_hash_password[^12aErT] [32mPASSED[0m[32m                                                                              [ 17%][0m
+v1/services/tests/test_passwords.py::test_hash_password[0GK$oqZtg5,rXPL*MXxy] [32mPASSED[0m[32m                                                                 [ 20%][0m
+v1/services/tests/test_passwords.py::test_hash_password[$%5{3^pRfNu,E6Fp2vjB] [32mPASSED[0m[32m                                                                 [ 23%][0m
+v1/services/tests/test_passwords.py::test_is_password_correct_with_password_which_matches_hashed_password[MyPassword37!] [32mPASSED[0m[32m                      [ 25%][0m
+v1/services/tests/test_passwords.py::test_is_password_correct_with_password_which_matches_hashed_password[=TopSecRET42] [32mPASSED[0m[32m                       [ 28%][0m
+v1/services/tests/test_passwords.py::test_is_password_correct_with_password_which_matches_hashed_password[^12aErT] [32mPASSED[0m[32m                            [ 30%][0m
+v1/services/tests/test_passwords.py::test_is_password_correct_with_password_which_does_not_match_hashed_password[^0GK$oqZtg5,rXPL*MXxy] [32mPASSED[0m[32m       [ 33%][0m
+v1/services/tests/test_passwords.py::test_is_password_correct_with_password_which_does_not_match_hashed_password[$%5{3^pRfNu,E6Fp2vjB] [32mPASSED[0m[32m        [ 35%][0m
+v1/services/tests/test_passwords.py::test_is_password_correct_with_password_which_does_not_match_hashed_password[#yAm5$*KNA&hZVRx.aS,] [32mPASSED[0m[32m        [ 38%][0m
+v1/utils/tests/test_utils.py::test_convert_string_to_bool_for_true_cases[1] [32mPASSED[0m[32m                                                                   [ 41%][0m
+v1/utils/tests/test_utils.py::test_convert_string_to_bool_for_true_cases[t] [32mPASSED[0m[32m                                                                   [ 43%][0m
+v1/utils/tests/test_utils.py::test_convert_string_to_bool_for_true_cases[T] [32mPASSED[0m[32m                                                                   [ 46%][0m
+v1/utils/tests/test_utils.py::test_convert_string_to_bool_for_true_cases[true] [32mPASSED[0m[32m                                                                [ 48%][0m
+v1/utils/tests/test_utils.py::test_convert_string_to_bool_for_true_cases[True] [32mPASSED[0m[32m                                                                [ 51%][0m
+v1/utils/tests/test_utils.py::test_convert_string_to_bool_for_true_cases[TRUE] [32mPASSED[0m[32m                                                                [ 53%][0m
+v1/utils/tests/test_utils.py::test_convert_string_to_bool_for_true_cases[y] [32mPASSED[0m[32m                                                                   [ 56%][0m
+v1/utils/tests/test_utils.py::test_convert_string_to_bool_for_true_cases[Y] [32mPASSED[0m[32m                                                                   [ 58%][0m
+v1/utils/tests/test_utils.py::test_convert_string_to_bool_for_true_cases[yes] [32mPASSED[0m[32m                                                                 [ 61%][0m
+v1/utils/tests/test_utils.py::test_convert_string_to_bool_for_true_cases[Yes] [32mPASSED[0m[32m                                                                 [ 64%][0m
+v1/utils/tests/test_utils.py::test_convert_string_to_bool_for_true_cases[YES] [32mPASSED[0m[32m                                                                 [ 66%][0m
+v1/utils/tests/test_utils.py::test_convert_string_to_bool_for_false_cases[0] [32mPASSED[0m[32m                                                                  [ 69%][0m
+v1/utils/tests/test_utils.py::test_convert_string_to_bool_for_false_cases[f] [32mPASSED[0m[32m                                                                  [ 71%][0m
+v1/utils/tests/test_utils.py::test_convert_string_to_bool_for_false_cases[F] [32mPASSED[0m[32m                                                                  [ 74%][0m
+v1/utils/tests/test_utils.py::test_convert_string_to_bool_for_false_cases[false] [32mPASSED[0m[32m                                                              [ 76%][0m
+v1/utils/tests/test_utils.py::test_convert_string_to_bool_for_false_cases[False] [32mPASSED[0m[32m                                                              [ 79%][0m
+v1/utils/tests/test_utils.py::test_convert_string_to_bool_for_false_cases[FALSE] [32mPASSED[0m[32m                                                              [ 82%][0m
+v1/utils/tests/test_utils.py::test_convert_string_to_bool_for_false_cases[n] [32mPASSED[0m[32m                                                                  [ 84%][0m
+v1/utils/tests/test_utils.py::test_convert_string_to_bool_for_false_cases[N] [32mPASSED[0m[32m                                                                  [ 87%][0m
+v1/utils/tests/test_utils.py::test_convert_string_to_bool_for_false_cases[no] [32mPASSED[0m[32m                                                                 [ 89%][0m
+v1/utils/tests/test_utils.py::test_convert_string_to_bool_for_false_cases[No] [32mPASSED[0m[32m                                                                 [ 92%][0m
+v1/utils/tests/test_utils.py::test_convert_string_to_bool_for_false_cases[NO] [32mPASSED[0m[32m                                                                 [ 94%][0m
+v1/utils/tests/test_utils.py::test_get_class_variables_for_regular_class [32mPASSED[0m[32m                                                                      [ 97%][0m
+v1/utils/tests/test_utils.py::test_get_class_variables_for_dataclass [32mPASSED[0m[32m                                                                          [100%][0m
+
+========================================================================= PASSES ==========================================================================
+---------------------------------- generated xml file: C:\Users\nitish\all\innovation\math_quiz_backend\data\pytest.xml -----------------------------------
+
+---------- coverage: platform win32, python 3.11.4-final-0 -----------
+Name                                         Stmts   Miss  Cover   Missing
+--------------------------------------------------------------------------
+v1\api_infra\lifespans\all.py                    8      2    75%   22-23
+v1\api_infra\lifespans\database.py               9      3    67%   14-16
+v1\database\connections.py                      12      4    67%   17-21
+v1\database\migrations\alembic_models.py         2      2     0%   14-15
+v1\database\migrations\env.py                   24     24     0%   3-73
+v1\database\models\test_factories\base.py        2      2     0%   3-6
+v1\database\models\test_factories\users.py      17     17     0%   3-28
+v1\routers\users.py                             26      5    81%   21, 28, 34, 40, 47
+v1\services\users.py                            28      9    68%   29, 39, 45-51, 57
+v1\test_fixtures\classes.py                     71     12    83%   39-40, 44, 48, 51, 54, 86-87, 91, 95, 98, 101
+v1\test_fixtures\database.py                    35      2    94%   28, 66
+--------------------------------------------------------------------------
+TOTAL                                          506     82    84%
+
+34 files skipped due to complete coverage.
+Coverage HTML written to dir htmlcov
+
+[32m=================================================================== [32m[1m39 passed[0m[32m in 4.53s[0m[32m ====================================================================[0m
