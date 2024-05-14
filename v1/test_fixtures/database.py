@@ -3,6 +3,9 @@
 Based on: https://stackoverflow.com/a/67348153/5702056
 """
 
+import importlib
+import inspect
+import pkgutil
 from collections.abc import Generator
 from uuid import uuid4
 
@@ -12,13 +15,38 @@ from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
 from v1.database.models.base import SqlAlchemyBase
-from v1.database.models.test_factories.users import UserFactory
+from v1.database.models.test_factories.base import BaseFactory
 from v1.settings import DEBUG_TEST_DATABASE, db_info
 
 testing_db_info = db_info
 testing_db_info.name = f"test-{testing_db_info.name}-{uuid4().hex}"
 testing_db_engine = create_engine(url=testing_db_info.url, echo=DEBUG_TEST_DATABASE)
 TestingDbSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=testing_db_engine)
+
+
+def get_database_model_factories() -> list[type(BaseFactory)]:
+    """Return a list of factories for database models."""
+    factory_models = []
+    package = "v1.database.models.test_factories"
+
+    # Iterate through all modules in the test_factories package and load these modules
+    for _importer, modname, _ispkg in pkgutil.iter_modules(importlib.import_module(package).__path__):
+        full_module_name = f"{package}.{modname}"
+        module = importlib.import_module(full_module_name)
+
+        # Iterate through all members of the module
+        for _name, obj in inspect.getmembers(module, inspect.isclass):
+            if issubclass(obj, BaseFactory) and obj is not BaseFactory:
+                factory_models.append(obj)
+
+    return factory_models
+
+
+def add_database_model_factories_to_db_session(provided_db_session: Session) -> None:
+    """Add all database model factories to the provided database session."""
+    factory_models = get_database_model_factories()
+    for factory in factory_models:
+        factory._meta.sqlalchemy_session = provided_db_session  # pylint: disable=protected-access
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -48,7 +76,7 @@ def fixture_db_session(_testing_db: Generator[None, None, None]):
     db_session = TestingDbSessionLocal(bind=db_connection)
 
     # Attach factories to the current session
-    UserFactory._meta.sqlalchemy_session = db_session  # pylint: disable=protected-access
+    add_database_model_factories_to_db_session(db_session)
 
     # Begin a nested transaction (using SAVEPOINT).
     nested = db_connection.begin_nested()
