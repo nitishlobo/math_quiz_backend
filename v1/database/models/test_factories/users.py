@@ -15,7 +15,7 @@ class UserFactory(BaseFactory):
     id_ = factory.Faker("uuid4")
     first_name = "John"
     last_name = "Francesco"
-    email = "john.francesco@gmail.com"
+    email = factory.LazyAttribute(lambda obj: f"{obj.first_name.lower()}.{obj.last_name.lower()}@gmail.com")
     hashed_password = factory.LazyAttribute(lambda obj: PasswordHasher().hash(obj.password))
     is_superuser = False
     created_at = datetime(2024, 5, 29, 1, 6, 40, 336080, tzinfo=timezone.utc)

@@ -12,6 +12,11 @@ from v1.database.models.users import User
 from v1.schemas.users import CreateUserRequest
 
 
+def datetime_obj_to_str(datetime_obj: datetime):
+    """Convert datetime with timezone object to string."""
+    return datetime_obj.strftime("%Y-%m-%dT%H:%M:%S.%f %Z").replace(" UTC", "Z")
+
+
 def test_create_user(fastapi_test_client: TestClient, db_session: Session, create_user_request: CreateUserRequest):
     """Test create user route and response."""
     # Allow for slight variance between system clock and database clock (i.e. use timedelta)
@@ -83,7 +88,7 @@ def test_create_same_user_as_above_test_is_possible(
     assert isinstance(response_data, dict)
 
 
-def test_create_user_who_already_exists_fails(
+def test_creating_a_user_who_already_exists_fails(
     fastapi_test_client: TestClient,
     db_session: Session,
     create_user_request: CreateUserRequest,
@@ -104,3 +109,51 @@ def test_create_user_who_already_exists_fails(
     assert response_data == {
         "message": f"User {user['email']} already exists. Cannot create a user who already exists.",
     }
+
+
+def test_read_users(fastapi_test_client: TestClient, db_session: Session):
+    """Test that given a user already exists, they cannot be created again."""
+    # Create users in the database
+    datetime_now = datetime.now(timezone.utc)
+    user_1 = UserFactory()
+    user_2 = UserFactory(first_name="Fulton", last_name="Sheen", is_superuser=True)
+    user_3 = UserFactory(first_name="John", last_name="Tolkien", created_at=datetime_now)
+    db_session.commit()
+
+    response = fastapi_test_client.get(f"{v1_router.prefix}/users")
+
+    # Verify response status and type
+    response_data = response.json()
+    assert response.status_code == 200
+    assert response_data == [
+        {
+            "created_at": datetime_obj_to_str(user_1.created_at),
+            "deleted_at": None,
+            "email": user_1.email,
+            "first_name": user_1.first_name,
+            "id": str(user_1.id_),
+            "is_superuser": False,
+            "last_name": user_1.last_name,
+            "updated_at": datetime_obj_to_str(user_1.updated_at),
+        },
+        {
+            "created_at": datetime_obj_to_str(user_2.created_at),
+            "deleted_at": None,
+            "email": "fulton.sheen@gmail.com",
+            "first_name": "Fulton",
+            "id": str(user_2.id_),
+            "is_superuser": True,
+            "last_name": "Sheen",
+            "updated_at": datetime_obj_to_str(user_2.updated_at),
+        },
+        {
+            "created_at": datetime_obj_to_str(datetime_now),
+            "deleted_at": None,
+            "email": "john.tolkien@gmail.com",
+            "first_name": "John",
+            "id": str(user_3.id_),
+            "is_superuser": False,
+            "last_name": "Tolkien",
+            "updated_at": datetime_obj_to_str(user_3.updated_at),
+        },
+    ]
