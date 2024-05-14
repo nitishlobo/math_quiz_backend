@@ -75,10 +75,6 @@ jobs:
           source .venv/bin/activate
           pytest --junitxml=data/pytest.xml --cov-report=term-missing:skip-covered --cov=. | tee data/pytest-coverage.txt
 
-  test-coverage:
-    name: Test coverage
-    runs-on: ubuntu-latest
-    steps:
       - name: Pytest coverage comment
         id: coverageComment
         uses: MishaKav/pytest-coverage-comment@main
@@ -88,7 +84,7 @@ jobs:
           badge-title: Test coverage
           hide-badge: false
           hide-report: false
-          create-new-comment: false
+          create-new-comment: true
           hide-comment: false
           report-only-changed-files: false
           remove-link-from-badge: false
