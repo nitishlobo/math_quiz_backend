@@ -17,10 +17,6 @@ def create_user(db: Session, user: CreateUserRequest) -> User:
     db_user = User(hashed_password=hashed_password, **user.model_dump(exclude={"password"}))
     db.add(db_user)
     db.commit()
-    # Flush to make User persistent in this session and get id and created_at.
-    # db.flush()
-    # Refresh to get `updated_at` field in db_user model.
-    db.refresh(db_user)
     return db_user
 
 
