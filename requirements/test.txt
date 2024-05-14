@@ -1,5 +1,6 @@
 -r prod.txt
 factory-boy~=3.3
 pytest~=7.4
+pytest-cov~=5.0
 pytest-mock~=3.14
 SQLAlchemy-Utils==0.41
