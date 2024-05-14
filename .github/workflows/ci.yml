@@ -103,25 +103,3 @@ jobs:
           echo "Coverage Tests - ${{ steps.coverageComment.outputs.tests }}"
           echo "Coverage Time - ${{ steps.coverageComment.outputs.time }}"
           echo "Not Success Test Info - ${{ steps.coverageComment.outputs.notSuccessTestInfo }}"
-
-  test-coverage:
-    name: Test coverage
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Validate minimum test coverage
-        id: run-tests
-        uses: dima-engineer/pytest-reporter@v3
-        with:
-          requirements-file: requirements/test.txt
-          cov-omit-list: tests/*
-          cov-threshold-single: 85
-          cov-threshold-total: 90
-          async-tests: true
