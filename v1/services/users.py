@@ -16,8 +16,9 @@ def create_user(db: Session, user: CreateUserRequest) -> User:
     hashed_password = common_services.hash_password(user.password)
     db_user = User(hashed_password=hashed_password, **user.model_dump(exclude={"password"}))
     db.add(db_user)
+    db.commit()
     # Flush to make User persistent in this session and get id and created_at.
-    db.flush()
+    # db.flush()
     # Refresh to get `updated_at` field in db_user model.
     db.refresh(db_user)
     return db_user
@@ -50,6 +51,7 @@ def update_user(db: Session, user_id: UUID, user: UpdateUser) -> User | None:
     return get_user_from_id(db, user_id)
 
 
+# @todo rename to soft_delete_user
 def delete_user(db: Session, user_id: UUID) -> None:
     """Delete user using user id."""
     db.query(User).filter_by(id_=user_id).update({"deleted": datetime.now(timezone.utc)})

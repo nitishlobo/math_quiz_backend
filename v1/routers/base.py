@@ -5,8 +5,10 @@ from enum import Enum
 from typing import Annotated, Any, Self
 
 from fastapi import APIRouter as FastAPIRouter
-from fastapi import Depends, Request
+from fastapi import Depends
 from sqlalchemy.orm.session import Session
+
+from v1.database.connections import get_db_session
 
 
 class APIRouter(FastAPIRouter):
@@ -34,11 +36,6 @@ class RouteTags(Enum):
 
     HEALTH_CHECK = "health-check"
     USERS = "users"
-
-
-def get_db_session(request: Request) -> Session:
-    """Return current database session from fastapi request state."""
-    return request.state.db_session  # type: ignore[no-any-return]
 
 
 DbSession = Annotated[Session, Depends(get_db_session)]
