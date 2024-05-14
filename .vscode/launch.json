@@ -1,0 +1,19 @@
+{
+  "configurations": [
+    {
+      "console": "integratedTerminal",
+      "env": {
+        "PYTEST_ADDOPTS": "--no-cov"
+      },
+      "justMyCode": true,
+      "name": "Debug Unit Test",
+      "program": "${file}",
+      "purpose": [
+        "debug-test"
+      ],
+      "request": "launch",
+      "type": "debugpy"
+    }
+  ],
+  "version": "0.2.0"
+}
