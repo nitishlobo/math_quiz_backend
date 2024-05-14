@@ -11,7 +11,9 @@ env:
   POSTGRES_DATABASE_NAME: "math_quiz"
 
 permissions:
-  contents: read
+  contents: write
+  checks: write
+  pull-requests: write
 
 jobs:
   lint:
@@ -77,6 +79,10 @@ jobs:
     name: Test coverage
     runs-on: ubuntu-latest
     steps:
+      - name: Build coverage file
+        run: |
+          pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=app tests/ | tee pytest-coverage.txt
+
       - name: Pytest coverage comment
         id: coverageComment
         uses: MishaKav/pytest-coverage-comment@main
