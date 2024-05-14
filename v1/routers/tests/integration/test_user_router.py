@@ -1,6 +1,5 @@
 """Test module for user router."""
 
-
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
@@ -102,4 +101,6 @@ def test_create_user_who_already_exists_fails(
     # Verify response status and type
     response_data = response.json()
     assert response.status_code == 400
-    assert response_data == {"detail": "Email already registered"}
+    assert response_data == {
+        "message": f"User {user['email']} already exists. Cannot create a user who already exists.",
+    }
