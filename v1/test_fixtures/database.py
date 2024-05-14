@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
 from v1.database.models.base import SqlAlchemyBase
+from v1.database.models.test_factories.users import UserFactory
 from v1.settings import DEBUG_TEST_DATABASE, db_info
 
 testing_db_info = db_info
@@ -30,14 +31,8 @@ def _testing_db() -> Generator[None, None, None]:
     create_database(url=testing_db_info.url)
 
     SqlAlchemyBase.metadata.create_all(bind=testing_db_engine)
-    # # Create a session
-    # db_session = create_db_session(db_engine=db_connection.engine, scoped_session_func=get_request_id)
-    # # Attach factories to the current session
-    # UserFactory._meta.sqlalchemy_session = db_session  # pylint: disable=protected-access
-
     yield
     SqlAlchemyBase.metadata.drop_all(bind=testing_db_engine)
-    # Teardown
     drop_database(testing_db_info.url)
 
 
@@ -51,6 +46,9 @@ def fixture_db_session(_testing_db: Generator[None, None, None]):
     db_connection = testing_db_engine.connect()
     db_transaction = db_connection.begin()
     db_session = TestingDbSessionLocal(bind=db_connection)
+
+    # Attach factories to the current session
+    UserFactory._meta.sqlalchemy_session = db_session  # pylint: disable=protected-access
 
     # Begin a nested transaction (using SAVEPOINT).
     nested = db_connection.begin_nested()
