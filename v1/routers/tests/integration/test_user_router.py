@@ -1,6 +1,6 @@
 """Test module for user router."""
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
 from fastapi.testclient import TestClient
@@ -13,9 +13,10 @@ from v1.schemas.users import CreateUserRequest
 
 def test_create_user(fastapi_test_client: TestClient, db_session: Session, create_user_request: CreateUserRequest):
     """Test create user route and response."""
-    datetime_before_request = datetime.now(timezone.utc)
+    # Allow for slight variance between system clock and database clock (i.e. use timedelta)
+    datetime_before_request = datetime.now(timezone.utc) - timedelta(minutes=1)
     response = fastapi_test_client.post(f"{v1_router.prefix}/users", json=create_user_request.model_dump())
-    datetime_after_request = datetime.now(timezone.utc)
+    datetime_after_request = datetime.now(timezone.utc) + timedelta(minutes=1)
 
     # Verify response status and type
     response_data = response.json()
@@ -62,3 +63,20 @@ def test_create_user(fastapi_test_client: TestClient, db_session: Session, creat
     assert db_user.created_at == response_user_created
     assert db_user.updated_at == response_user_created
     assert db_user.deleted_at is None
+
+
+def test_create_same_user_as_above_test_is_possible(
+    fastapi_test_client: TestClient,
+    create_user_request: CreateUserRequest,
+):
+    """Test creating the same user as the above test succeeds.
+
+    This test is to ensure that every subsequent test is not affected by the changes
+    made in the database from the previous test. Each test should rollback any commits that were made.
+    """
+    response = fastapi_test_client.post(f"{v1_router.prefix}/users", json=create_user_request.model_dump())
+
+    # Verify response status and type
+    response_data = response.json()
+    assert response.status_code == 200
+    assert isinstance(response_data, dict)

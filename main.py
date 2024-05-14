@@ -3,7 +3,6 @@
 from fastapi import APIRouter, FastAPI
 
 from v1.api_infra.lifespans.all import lifespans
-from v1.api_infra.middlewares.database import db_session_middleware
 from v1.routers.health_check import router as health_check_router
 from v1.routers.users import router as user_router
 from v1.settings import APP_TITLE, DEBUG_FASTAPI_APP
@@ -19,6 +18,3 @@ v1_router.include_router(user_router)
 # Main app routes
 main_app.include_router(health_check_router)
 main_app.include_router(v1_router)
-
-# Middlewares
-main_app.middleware("http")(db_session_middleware)
