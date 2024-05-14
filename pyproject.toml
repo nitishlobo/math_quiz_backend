@@ -260,13 +260,32 @@ exclude_dirs = ["tests"]
 skips = ["*_test.py", "*/test_*.py", "**/conftest.py"]
 
 # -------------------------------------------------------------------------------------------------
-# Testing
+# Testing and coverage
 # -------------------------------------------------------------------------------------------------
 
 [tool.pytest.ini_options]
-addopts = "-vv -rfEsP --tb=long --color=yes --code-highlight=yes --cov=. --cov-report html"
+addopts = "-vv -rfEsP --tb=long --color=yes --code-highlight=yes --cov=. --cov-report=html"
 filterwarnings = [
     # Warning from httpx library that FastAPI has not patched just yet
     # For more info, see: https://github.com/tiangolo/fastapi/discussions/6211#discussioncomment-8815439
     'ignore:The .app. shortcut is now deprecated\. Use the explicit style .transport=WSGITransport\(app=\.\.\.\). instead\.:DeprecationWarning'
 ]
+
+[tool.coverage.run]
+# Exclude the following paths from test coverage reports
+omit = [
+    "v1/database/migrations/env.py",
+    "v1/database/migrations/alembic_models.py",
+    "v1/database/models/test_factories/*",
+    "v1/test_fixtures/*",
+]
+
+[tool.coverage.report]
+# When running a summary report, show missing lines.
+show_missing = true
+
+# Don't report files that are 100% covered. Helps focus on files that need attention.
+skip_covered = true
+
+# Don't report files that have no executable code (such as __init__.py files).
+skip_empty = true
