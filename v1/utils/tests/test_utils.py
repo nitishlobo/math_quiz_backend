@@ -1,10 +1,24 @@
 """Test for utils."""
 
+from collections import Counter
 from datetime import datetime, timezone
 
 import pytest
 
-from v1.utils.utils import convert_string_to_bool, get_class_variables
+from v1.test_fixtures.sample_package.air_animals import AirAnimal
+from v1.test_fixtures.sample_package.ambidextrous import AmbidextrousAnimal
+from v1.test_fixtures.sample_package.base import Animal, Helicopter
+from v1.test_fixtures.sample_package.land_animals import LandAnimal
+from v1.test_fixtures.sample_package.omnivores.bears import BlackBear, PolarBear
+from v1.test_fixtures.sample_package.omnivores.birds.hen import Hen, Pullet, Rooster
+from v1.test_fixtures.sample_package.omnivores.birds.peacock import African, Indian
+from v1.test_fixtures.sample_package.sea_animals import BlueWhale, Dolphin, SeaAnimal, Whale
+from v1.utils.utils import (
+    convert_string_to_bool,
+    get_class_variables,
+    get_classes_from_package_recursively,
+    get_subclasses_of_class_from_package_recursively,
+)
 
 
 @pytest.mark.parametrize("bool_as_str", ["1", "t", "T", "true", "True", "TRUE", "y", "Y", "yes", "Yes", "YES"])
@@ -46,3 +60,131 @@ def test_get_class_variables_for_dataclass(complex_dataclass: type) -> None:
         deleted_by=None,
     )
     assert get_class_variables(complex_dataclass_instance) == expected_class_variables
+
+
+@pytest.mark.parametrize(
+    ("package", "expected_classes"),
+    [
+        (
+            "v1.test_fixtures.sample_package",
+            {
+                Rooster,
+                Hen,
+                Pullet,
+                Indian,
+                African,
+                BlackBear,
+                PolarBear,
+                AirAnimal,
+                AmbidextrousAnimal,
+                Animal,
+                Helicopter,
+                LandAnimal,
+                SeaAnimal,
+                Whale,
+                BlueWhale,
+                Dolphin,
+            },
+        ),
+        (
+            "v1.test_fixtures.sample_package.omnivores",
+            {Rooster, Hen, Pullet, Indian, African, BlackBear, PolarBear},
+        ),
+        (
+            "v1.test_fixtures.sample_package.omnivores.birds",
+            {Rooster, Hen, Pullet, Indian, African},
+        ),
+    ],
+    ids=[
+        "highest-package-level",
+        "middle-package-level",
+        "lowest-package-level",
+    ],
+)
+def test_get_classes_from_package_recursively(package: str, expected_classes: set[type]) -> None:
+    """Test getting all the subclasses belonging to a class from a package."""
+    classes = get_classes_from_package_recursively(package)
+    assert set(classes) == set(expected_classes)
+
+
+@pytest.mark.parametrize(
+    ("parent_class", "package", "expected_subclasses"),
+    [
+        (
+            Animal,
+            "v1.test_fixtures.sample_package",
+            [
+                AmbidextrousAnimal,
+                LandAnimal,
+                SeaAnimal,
+                Whale,
+                BlueWhale,
+                Dolphin,
+                AirAnimal,
+                BlackBear,
+                PolarBear,
+                Hen,
+                Pullet,
+            ],
+        ),
+        (
+            Animal,
+            "v1.test_fixtures.sample_package.omnivores",
+            [BlackBear, PolarBear, Hen, Pullet],
+        ),
+        (
+            Animal,
+            "v1.test_fixtures.sample_package.omnivores.birds",
+            [Hen, Pullet],
+        ),
+        (
+            LandAnimal,
+            "v1.test_fixtures.sample_package",
+            [AmbidextrousAnimal, PolarBear],
+        ),
+        (
+            LandAnimal,
+            "v1.test_fixtures.sample_package.omnivores",
+            [PolarBear],
+        ),
+        (
+            LandAnimal,
+            "v1.test_fixtures.sample_package.omnivores.birds",
+            [],
+        ),
+        (
+            BlueWhale,
+            "v1.test_fixtures.sample_package",
+            [],
+        ),
+        (
+            BlueWhale,
+            "v1.test_fixtures.sample_package.omnivores",
+            [],
+        ),
+        (
+            BlueWhale,
+            "v1.test_fixtures.sample_package.omnivores.birds",
+            [],
+        ),
+    ],
+    ids=[
+        "highest-class-order-at-highest-package-level",
+        "highest-class-order-at-middle-package-level",
+        "lowest-class-order-at-lowest-package-level",
+        "middle-class-order-at-highest-package-level",
+        "middle-class-order-at-middle-package-level",
+        "middle-class-order-at-lowest-package-level",
+        "lowest-class-order-at-highest-package-level",
+        "lowest-class-order-at-middle-package-level",
+        "lowest-class-order-at-lowest-package-level",
+    ],
+)
+def test_get_subclasses_of_class_from_package_recursively(
+    parent_class: type,
+    package: str,
+    expected_subclasses: list[type],
+) -> None:
+    """Test getting all the subclasses belonging to a class from a package."""
+    animal_subclasses = get_subclasses_of_class_from_package_recursively(parent_class, package)
+    assert Counter(animal_subclasses) == Counter(expected_subclasses)
