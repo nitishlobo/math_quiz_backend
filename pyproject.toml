@@ -75,6 +75,7 @@ select = [
 ignore = [
     "A002",     # builtin shadowing - covered by pylint redefined-builtin
     "ANN101",   # missing-type-self - (type checkers can infer self type without annotation - ruff docs mention it will be removed in a future release)
+    "ANN102",   # missing-type-cls - (type checkers can infer cls type without annotation - ruff docs mention it will be removed in a future release)
     "ARG001",   # unused function argument - covered by pylint unused-argument
     "ARG002",   # unused method argument - covered by pylint unused-argument
     "D207",     # docstring under-indentation

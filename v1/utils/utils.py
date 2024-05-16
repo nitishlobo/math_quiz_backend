@@ -1,5 +1,9 @@
 """Helper functions for settings."""
 
+import importlib
+import inspect
+import pkgutil
+
 
 def convert_string_to_bool(bool_as_str: str) -> bool:
     """Convert a string representing a boolean to a boolean type."""
@@ -31,3 +35,55 @@ def get_class_variables(cls_or_instance: type | object) -> set[str]:
 
     # Exclude private variables
     return {class_var for class_var in class_vars if not class_var.startswith("_")}
+
+
+def get_classes_from_package_recursively(package: str) -> list[type]:
+    """Return a list of classes inside a given package (recurse thorugh any sub-packages).
+
+    Keyword arguments:
+    package -- package represented as a string. Must not be relative.
+
+    Example:
+    >>> classes = get_classes_from_package_recursively(package="v1.database.models")
+    >>> classes
+    ... [SqlAlchemyBase, TimeAudit, Users, etc...]
+    """
+    classes_in_package = []
+    # Go through the modules in the package
+    for _importer, module_name, is_package in pkgutil.iter_modules(importlib.import_module(package).__path__):
+        full_module_name = f"{package}.{module_name}"
+        # Recurse through any sub-packages
+        if is_package:
+            classes_in_subpackage = get_classes_from_package_recursively(package=full_module_name)
+            classes_in_package.extend(classes_in_subpackage)
+
+        # Load the module for inspection
+        module = importlib.import_module(full_module_name)
+
+        # Iterate through all the objects in the module and
+        # using the lambda, filter for class objects and only objects that exist within the module
+        for _name, obj in inspect.getmembers(
+            module,
+            lambda member, module_name=full_module_name: inspect.isclass(member) and member.__module__ == module_name,
+        ):
+            classes_in_package.append(obj)
+    return classes_in_package
+
+
+def get_subclasses_of_class_from_package_recursively(parent_class: type, package: str) -> list[type]:
+    """Return a list of subclasses (i.e. classes which inherit from the parent_class) inside a given package.
+
+    This will work recursively for any package.
+
+    Keyword arguments:
+    parent_class -- parent class from which the subclasses need to be found
+    package -- package which needs to be searched for subclasses. Must not be relative.
+
+    Example:
+    >>> from v1.database.models.base import SqlAlchemyBase
+    >>> alchemy_models = get_subclasses_of_class_from_package(parent_class=SqlAlchemyBase, package="v1.database.models")
+    >>> alchemy_models
+    ... [Users, etc...]
+    """
+    classes_in_package = get_classes_from_package_recursively(package)
+    return [class_ for class_ in classes_in_package if issubclass(class_, parent_class) and class_ is not parent_class]
