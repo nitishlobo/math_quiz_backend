@@ -12,4 +12,7 @@ https://stackoverflow.com/a/70890339/5702056
 
 # pylint: disable=unused-import
 from v1.database.models.base import SqlAlchemyBase
-from v1.database.models.users import User
+from v1.utils.utils import get_subclasses_of_class_from_package_recursively
+
+# Import all the SQL Alchemy models inheriting from SqlAlchemyBase
+get_subclasses_of_class_from_package_recursively(parent_class=SqlAlchemyBase, package="v1.database.models")
