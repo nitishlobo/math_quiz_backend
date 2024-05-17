@@ -29,8 +29,8 @@ def add_database_model_factories_to_db_session(provided_db_session: Session) -> 
         parent_class=BaseFactory,
         package="v1.database.models.test_factories",
     )
-    for factory in factory_models:
-        factory._meta.sqlalchemy_session = provided_db_session  # pylint: disable=protected-access
+    for factory_ in factory_models:
+        factory_._meta.sqlalchemy_session = provided_db_session  # pylint: disable=protected-access
 
 
 @pytest.fixture(scope="session", autouse=True)
