@@ -22,6 +22,8 @@ fix = true
 show-fixes = true
 show-source = true
 line-length = 120
+
+[tool.ruff.lint]
 ignore-init-module-imports = true
 select = [
     "F",      # pyflakes
@@ -95,18 +97,18 @@ unfixable = [
     "RUF100",   # unused-noqa - (buggy, remove yesqa from pre-commit and remove this once it has matured)
 ]
 
-[tool.ruff.flake8-bugbear]
+[tool.ruff.lint.flake8-bugbear]
 extend-immutable-calls = ["fastapi.Depends", "fastapi.params.Depends", "fastapi.Query", "fastapi.params.Query"]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = [""]
 known-local-folder = [""]
 section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
 
-[tool.ruff.pep8-naming]
+[tool.ruff.lint.pep8-naming]
 classmethod-decorators = ["pydantic.validator"]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "conftest.py" = [
     "F401",    # Unused import
     "ANN201",  # Return type annotation missing - (pointless in tests)
@@ -128,10 +130,10 @@ classmethod-decorators = ["pydantic.validator"]
     "INP001"   # Implicit namespace package for alembic (alembic migrations folder should not be a module)
 ]
 
-[tool.ruff.pycodestyle]
+[tool.ruff.lint.pycodestyle]
 max-doc-length = 120
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "pep257"
 
 [tool.black]
