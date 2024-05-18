@@ -30,6 +30,10 @@ class SqlAlchemyBase(DeclarativeBase):
         },
     )
 
+    def to_dict(self) -> dict[str, Any]:
+        """Return SQL Alchemy model as a dictionary."""
+        return {key: value for key, value in self.__dict__.items() if key != "_sa_instance_state"}
+
 
 class TimeAudit:
     """Datetime-with-timezone-stamp fields used for auditing tables.

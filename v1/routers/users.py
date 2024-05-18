@@ -5,7 +5,7 @@ from uuid import UUID
 from v1.database.models.users import User
 from v1.exceptions.users import UserAlreadyExistsError
 from v1.routers.base import APIRouter, DbSession, RouteTags
-from v1.schemas.users import CreateUserRequest, UpdateUser, UpdateUserRequest, UserResponse
+from v1.schemas.users import CreateUserRequest, CreateUserService, UpdateUserRequest, UpdateUserService, UserResponse
 from v1.services import users as users_service
 
 router = APIRouter(prefix="/users", tags=[RouteTags.USERS])
@@ -17,7 +17,7 @@ def create_user(db_session: DbSession, user: CreateUserRequest) -> User:
     db_user = users_service.get_user_from_email(db_session, user.email)
     if db_user:
         raise UserAlreadyExistsError(email=user.email)
-    return users_service.create_user(db_session, user)
+    return users_service.create_user(db_session, CreateUserService(**user.model_dump()))
 
 
 @router.get("/", response_model=list[UserResponse])
@@ -35,11 +35,11 @@ def read_user(db_session: DbSession, user_id: UUID) -> User | None:
 @router.patch("/{user_id}", response_model=UserResponse)
 def update_user(db_session: DbSession, user_id: UUID, user: UpdateUserRequest) -> User | None:
     """Return updated user."""
-    return users_service.update_user(db_session, user_id, UpdateUser(**user.model_dump()))
+    return users_service.update_user(db_session, user_id, UpdateUserService(**user.model_dump()))
 
 
 @router.delete("/{user_id}")
 def delete_user(db_session: DbSession, user_id: UUID) -> None:
     """Return updated user."""
     # @fix convey information whether deleting was successful
-    users_service.delete_user(db_session, user_id)
+    users_service.soft_delete_user(db_session, user_id)

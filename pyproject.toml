@@ -272,6 +272,17 @@ filterwarnings = [
     # For more info, see: https://github.com/tiangolo/fastapi/discussions/6211#discussioncomment-8815439
     'ignore:The .app. shortcut is now deprecated\. Use the explicit style .transport=WSGITransport\(app=\.\.\.\). instead\.:DeprecationWarning'
 ]
+# Options to run tests as marked slow, integration, etc.
+# To run only tests with a specific mark, do:
+# pytest -m "my_mark"
+# eg: pytest -m "slow"  # Run only slow tests
+# To run only tests without a specific mark, do:
+# pytest -m "not my_mark"
+# eg: pytest -m "not slow"  # Run tests that aren't slow
+markers = [
+    "slow: slow tests",
+    "integration: integration tests",
+]
 
 [tool.coverage.run]
 # Exclude the following paths from test coverage reports
