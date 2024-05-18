@@ -21,6 +21,7 @@ def create_user(db_session: Session, user: CreateUserService) -> User:
 
 def get_user_from_id(db_session: Session, user_id: UUID) -> User | None:
     """Return user model object from user id."""
+    # @todo change query style to SQLAlchemy 2.0
     return db_session.query(User).filter(User.id_ == user_id).first()
 
 
@@ -31,10 +32,10 @@ def get_user_from_email(db_session: Session, email: str) -> User | None:
 
 def get_users(db_session: Session, offset: int = 0, limit: int = 100) -> list[User]:
     """Return users based on the offset and limit restriction applied."""
+    # @todo sort by first name so that the order is always the same
     return db_session.query(User).offset(offset).limit(limit).all()
 
 
-# @todo remove UpdateUserRequest from this service file as this is a view model
 def update_user(db_session: Session, user_id: UUID, user: UpdateUserService) -> User | None:
     """Return updated user."""
     user_data = user.model_dump(exclude={"password"}, exclude_unset=True)

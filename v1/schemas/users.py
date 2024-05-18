@@ -5,6 +5,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
+# @todo add validator for all email fields
+
 
 class CreateUserBase(BaseModel):
     """Common fields between create user service and request."""
