@@ -20,7 +20,7 @@ warn_unused_configs = true
 target-version = "py311"
 fix = true
 show-fixes = true
-show-source = true
+output-format = "full"
 line-length = 120
 
 [tool.ruff.lint]
@@ -101,8 +101,8 @@ unfixable = [
 extend-immutable-calls = ["fastapi.Depends", "fastapi.params.Depends", "fastapi.Query", "fastapi.params.Query"]
 
 [tool.ruff.lint.isort]
-known-first-party = [""]
-known-local-folder = [""]
+# known-first-party = [""]
+# known-local-folder = [""]
 section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
 
 [tool.ruff.lint.pep8-naming]
