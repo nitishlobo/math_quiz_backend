@@ -7,7 +7,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from main import v1_router
+from main import v1_router  # pylint: disable=no-name-in-module
 from v1.database.models.test_factories.users import UserFactory
 from v1.database.models.users import User
 from v1.schemas.users import CreateUserRequest
