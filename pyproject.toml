@@ -268,7 +268,6 @@ skips = ["*_test.py", "*/test_*.py", "**/conftest.py"]
 # -------------------------------------------------------------------------------------------------
 
 [tool.pytest.ini_options]
-
 # Add current directory to the python path, so it does not run other projects
 # See: https://stackoverflow.com/a/50610630/5702056
 pythonpath = [
