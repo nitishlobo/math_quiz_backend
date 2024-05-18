@@ -4,9 +4,9 @@ from uuid import UUID
 
 from v1.database.models.users import User
 from v1.exceptions.users import UserAlreadyExistsError
-from v1.routers.base import APIRouter, DbSession, RouteTags
 from v1.schemas.users import CreateUserRequest, CreateUserService, UpdateUserRequest, UpdateUserService, UserResponse
 from v1.services import users as users_service
+from v1.views.base import APIRouter, DbSession, RouteTags
 
 router = APIRouter(prefix="/users", tags=[RouteTags.USERS])
 
