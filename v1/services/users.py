@@ -31,9 +31,10 @@ def get_user_from_email(db_session: Session, email: str) -> User | None:
 
 
 def get_users(db_session: Session, offset: int = 0, limit: int = 100) -> list[User]:
-    """Return users based on the offset and limit restriction applied."""
-    # @todo sort by first name so that the order is always the same
-    return db_session.query(User).offset(offset).limit(limit).all()
+    """Return users sorted by first and last name and also based on the offset and limit restriction."""
+    return (
+        db_session.query(User).order_by(User.first_name.asc(), User.last_name.asc()).offset(offset).limit(limit).all()
+    )
 
 
 def update_user(db_session: Session, user_id: UUID, user: UpdateUserService) -> User | None:
