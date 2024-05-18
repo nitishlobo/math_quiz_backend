@@ -266,12 +266,23 @@ skips = ["*_test.py", "*/test_*.py", "**/conftest.py"]
 # -------------------------------------------------------------------------------------------------
 
 [tool.pytest.ini_options]
+
+# Add current directory to the python path, so it does not run other projects
+# See: https://stackoverflow.com/a/50610630/5702056
+pythonpath = [
+  "."
+]
+
+# Pytest command line args
 addopts = "-vv -rfEsP --tb=long --color=yes --code-highlight=yes --cov=. --cov-report=html"
+
+# Do not report the following warnings
 filterwarnings = [
     # Warning from httpx library that FastAPI has not patched just yet
     # For more info, see: https://github.com/tiangolo/fastapi/discussions/6211#discussioncomment-8815439
     'ignore:The .app. shortcut is now deprecated\. Use the explicit style .transport=WSGITransport\(app=\.\.\.\). instead\.:DeprecationWarning'
 ]
+
 # Options to run tests as marked slow, integration, etc.
 # To run only tests with a specific mark, do:
 # pytest -m "my_mark"
