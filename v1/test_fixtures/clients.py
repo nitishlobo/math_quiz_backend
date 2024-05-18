@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
 from main import main_app
-from v1.routers.base import get_db_session
+from v1.views.base import get_db_session
 
 
 @pytest.fixture()
