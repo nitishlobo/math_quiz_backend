@@ -13,40 +13,56 @@ PYTEST_CMD_WITH_THREADING = $(PYTEST_CMD) -n 5
 help:
 	@echo "-----------------------------------------------------------------------------------------------------------"
 	@echo "RUN"
-	@echo "  run                        run the FastAPI app locally"
+	@echo "  run                            run the FastAPI app locally"
 	@echo "-----------------------------------------------------------------------------------------------------------"
 	@echo "TEST"
-	@echo "  test                       run unit tests"
+	@echo "  test                           run all unit and integration tests"
+	@echo "  test-slow-only                 run only slow tests"
+	@echo "  test-not-slow-only             run only tests that are not slow"
+	@echo "  test-only-integration-tests    run only integration tests"
+	@echo "  test-only-unit-tests           run only unit tests"
 	@echo "-----------------------------------------------------------------------------------------------------------"
 	@echo "LINT"
-	@echo "  install-lint               install python linting tools"
-	@echo "  update-lint                update python linting tools"
-	@echo "  lint                       run autopep8, ruff, black and other linting tools on staged files"
-	@echo "  lint-all                   run autopep8, ruff, black and other linting tools on the entire repo"
+	@echo "  install-lint                   install python linting tools"
+	@echo "  update-lint                    update python linting tools"
+	@echo "  lint                           run autopep8, ruff, black and other linting tools on staged files"
+	@echo "  lint-all                       run autopep8, ruff, black and other linting tools on the entire repo"
 	@echo "-----------------------------------------------------------------------------------------------------------"
 	@echo "CLEAN"
-	@echo "  clean                      clean build, test, coverage, python artifacts and AWS outputs"
-	@echo "  clean-build                clean python build artifacts"
-	@echo "  clean-pyc                  clean python file artifacts"
-	@echo "  clean-lint                 clean python file artifacts"
-	@echo "  clean-test                 clean python test and coverage artifacts"
+	@echo "  clean                          clean build, test, coverage, python artifacts and AWS outputs"
+	@echo "  clean-build                    clean python build artifacts"
+	@echo "  clean-pyc                      clean python file artifacts"
+	@echo "  clean-lint                     clean python file artifacts"
+	@echo "  clean-test                     clean python test and coverage artifacts"
 	@echo "-----------------------------------------------------------------------------------------------------------"
 	@echo "DATABASE"
-	@echo "  db-current-rev             display the current alembic revision of the database"
-	@echo "  db-upgrade-all             upgrade the database with all the available alembic revisions"
-	@echo "  db-downgrade-all           downgrade the database with all the available alembic revisions"
-	@echo "  db-migrate msg='example'   take all python sqlalchemy models and autogenerates migration files"
-	@echo "      msg                        description of what is being migrated (will be in file name and docstring)"
-	@echo "  db-upgrade rev='ae1'       upgrade the database to a specific revision number"
-	@echo "      rev                        partial/complete revision id of the alembic file or relative integer"
-	@echo "  db-downgrade rev='ae1'     upgrade the database to a specific revision number"
-	@echo "      rev                        partial/complete revision id of the alembic file or relative integer"
+	@echo "  db-current-rev                 display the current alembic revision of the database"
+	@echo "  db-upgrade-all                 upgrade the database with all the available alembic revisions"
+	@echo "  db-downgrade-all               downgrade the database with all the available alembic revisions"
+	@echo "  db-migrate msg='example'       take all python sqlalchemy models and autogenerates migration files"
+	@echo "      msg                            description of what is being migrated (will be in file name and docstring)"
+	@echo "  db-upgrade rev='ae1'           upgrade the database to a specific revision number"
+	@echo "      rev                            partial/complete revision id of the alembic file or relative integer"
+	@echo "  db-downgrade rev='ae1'         upgrade the database to a specific revision number"
+	@echo "      rev                            partial/complete revision id of the alembic file or relative integer"
 
 run:
 	uvicorn main:main_app --reload
 
 test:
 	pytest
+
+test-only-slow-tests:
+	pytest -m "slow"
+
+test-only-fast-tests:
+	pytest -m "not slow"
+
+test-only-integration-tests:
+	pytest -m "integration"
+
+test-only-unit-tests:
+	pytest -m "not integration"
 
 # Remove all build, test, coverage and python artifacts.
 clean: clean-build clean-pyc clean-lint clean-test

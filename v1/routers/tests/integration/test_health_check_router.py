@@ -1,8 +1,10 @@
 """Test router for health check."""
 
+import pytest
 from fastapi.testclient import TestClient
 
 
+@pytest.mark.integration()
 def test_health_check_for_main_app(fastapi_test_client: TestClient):
     """Test health check endpoint for main app (root app)."""
     response = fastapi_test_client.get("/health-check")
@@ -10,6 +12,7 @@ def test_health_check_for_main_app(fastapi_test_client: TestClient):
     assert response.json() == {"message": "Alive and well!"}
 
 
+@pytest.mark.integration()
 def test_health_check_for_app_v1(fastapi_test_client: TestClient):
     """Test health check endpoint for v1 of app."""
     # Intentionally hard code /api/v1 rather than importing v1_router.prefix from main.py.

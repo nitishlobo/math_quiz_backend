@@ -3,6 +3,7 @@
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
@@ -17,6 +18,7 @@ def datetime_obj_to_str(datetime_obj: datetime):
     return datetime_obj.strftime("%Y-%m-%dT%H:%M:%S.%f %Z").replace(" UTC", "Z")
 
 
+@pytest.mark.integration()
 def test_create_user(fastapi_test_client: TestClient, db_session: Session, create_user_request: CreateUserRequest):
     """Test create user route and response."""
     # Allow for slight variance between system clock and database clock (i.e. use timedelta)
@@ -71,6 +73,7 @@ def test_create_user(fastapi_test_client: TestClient, db_session: Session, creat
     assert db_user.deleted_at is None
 
 
+@pytest.mark.integration()
 def test_create_same_user_as_above_test_is_possible(
     fastapi_test_client: TestClient,
     create_user_request: CreateUserRequest,
@@ -88,6 +91,7 @@ def test_create_same_user_as_above_test_is_possible(
     assert isinstance(response_data, dict)
 
 
+@pytest.mark.integration()
 def test_creating_a_user_who_already_exists_fails(
     fastapi_test_client: TestClient,
     db_session: Session,
@@ -111,6 +115,7 @@ def test_creating_a_user_who_already_exists_fails(
     }
 
 
+@pytest.mark.integration()
 def test_read_users(fastapi_test_client: TestClient, db_session: Session):
     """Test that given a user already exists, they cannot be created again."""
     # Create users in the database
