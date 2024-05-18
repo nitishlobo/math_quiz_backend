@@ -1,6 +1,7 @@
 """Test module for user router."""
 
 from datetime import datetime, timedelta, timezone
+from operator import itemgetter
 from uuid import UUID
 
 import pytest
@@ -21,11 +22,15 @@ def datetime_obj_to_str(datetime_obj: datetime):
 @pytest.mark.integration()
 def test_create_user(fastapi_test_client: TestClient, db_session: Session, create_user_request: CreateUserRequest):
     """Test create user route and response."""
+    # Given
     # Allow for slight variance between system clock and database clock (i.e. use timedelta)
     datetime_before_request = datetime.now(timezone.utc) - timedelta(minutes=1)
+
+    # When
     response = fastapi_test_client.post(f"{v1_router.prefix}/users", json=create_user_request.model_dump())
     datetime_after_request = datetime.now(timezone.utc) + timedelta(minutes=1)
 
+    # Then
     # Verify response status and type
     response_data = response.json()
     assert response.status_code == 200
@@ -83,8 +88,10 @@ def test_create_same_user_as_above_test_is_possible(
     This test is to ensure that every subsequent test is not affected by the changes
     made in the database from the previous test. Each test should rollback any commits that were made.
     """
+    # When
     response = fastapi_test_client.post(f"{v1_router.prefix}/users", json=create_user_request.model_dump())
 
+    # Then
     # Verify response status and type
     response_data = response.json()
     assert response.status_code == 200
@@ -98,15 +105,17 @@ def test_creating_a_user_who_already_exists_fails(
     create_user_request: CreateUserRequest,
 ):
     """Test that given a user already exists, they cannot be created again."""
+    # Given
     user = create_user_request.model_dump()
-
     # Create the user in the database
     UserFactory(**user)
     db_session.commit()
 
+    # When
     # Try to create the user again
     response = fastapi_test_client.post(f"{v1_router.prefix}/users", json=user)
 
+    # Then
     # Verify response status and type
     response_data = response.json()
     assert response.status_code == 400
@@ -118,6 +127,7 @@ def test_creating_a_user_who_already_exists_fails(
 @pytest.mark.integration()
 def test_read_users(fastapi_test_client: TestClient, db_session: Session):
     """Test that given a user already exists, they cannot be created again."""
+    # Given
     # Create users in the database
     datetime_now = datetime.now(timezone.utc)
     user_1 = UserFactory()
@@ -125,12 +135,14 @@ def test_read_users(fastapi_test_client: TestClient, db_session: Session):
     user_3 = UserFactory(first_name="John", last_name="Tolkien", created_at=datetime_now)
     db_session.commit()
 
+    # When
     response = fastapi_test_client.get(f"{v1_router.prefix}/users")
 
+    # Then
     # Verify response status and type
     response_data = response.json()
     assert response.status_code == 200
-    assert response_data == [
+    expected_response = [
         {
             "created_at": datetime_obj_to_str(user_1.created_at),
             "deleted_at": user_1.deleted_at,
@@ -162,3 +174,7 @@ def test_read_users(fastapi_test_client: TestClient, db_session: Session):
             "updated_at": datetime_obj_to_str(user_3.updated_at),
         },
     ]
+    # Sort response data and expected response by id to compare
+    sorted_response_data = sorted(response_data, key=itemgetter("id"))
+    sorted_expected_response = sorted(expected_response, key=itemgetter("id"))
+    assert sorted_response_data == sorted_expected_response

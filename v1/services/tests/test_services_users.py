@@ -1,7 +1,8 @@
 """Test users service."""
 
-# @todo rename to test_users_service
 import uuid
+from collections.abc import Sequence
+from typing import Any
 
 import pytest
 from sqlalchemy import select
@@ -95,57 +96,90 @@ def test_get_user_from_email_using_an_email_that_does_not_match_any_user(db_sess
     assert db_user is None
 
 
+def get_users_as_list_of_dict(users: Sequence[User]) -> list[dict[str, Any]]:
+    """Return users as a list of dictionary objects."""
+    users_list = []
+    for user in users:
+        users_list.append(user.to_dict())
+    return users_list
+
+
 @pytest.mark.slow()
 def test_get_users(db_session: Session):
     """Test service for getting a users."""
     # Given
     # Create 200 users
-    expected_users = UserFactory.create_batch(200)
+    UserFactory.create_batch(200)
     db_session.commit()
-    expected_users = db_session.scalars(select(User)).all()
+    expected_users = db_session.scalars(select(User).order_by(User.first_name.asc(), User.last_name.asc())).all()
+    expected_user_list = get_users_as_list_of_dict(expected_users)
 
     # When
     # Default query - no offset, no limit
-    page_1_of_2_db_users_results = get_users(db_session)
-    page_2_of_2_db_users_results = get_users(db_session, offset=100)
+    page_1_of_2_db_users = get_users(db_session)
+    page_2_of_2_db_users = get_users(db_session, offset=100)
 
     # Custom query - offset and limit provided
-    page_1_of_4_db_users_results = get_users(db_session, offset=0, limit=50)
-    page_2_of_4_db_users_results = get_users(db_session, offset=50, limit=50)
-    page_3_of_4_db_users_results = get_users(db_session, offset=100, limit=50)
-    page_4_of_4_db_users_results = get_users(db_session, offset=150, limit=50)
+    page_1_of_4_db_users = get_users(db_session, offset=0, limit=50)
+    page_2_of_4_db_users = get_users(db_session, offset=50, limit=50)
+    page_3_of_4_db_users = get_users(db_session, offset=100, limit=50)
+    page_4_of_4_db_users = get_users(db_session, offset=150, limit=50)
 
     # Then
     # Verify 200 users were created
     assert len(expected_users) == 200
 
     # Verify that by default only 100 results are given back
-    assert len(page_1_of_2_db_users_results) == 100
-    assert len(page_2_of_2_db_users_results) == 100
+    assert len(page_1_of_2_db_users) == 100
+    assert len(page_2_of_2_db_users) == 100
     # Verify that the boundary results are not repeated
-    assert page_1_of_2_db_users_results[49].to_dict() != page_2_of_2_db_users_results[0].to_dict()
+    assert page_1_of_2_db_users[49].to_dict() != page_2_of_2_db_users[0].to_dict()
+    # Verify that combining the paginated database users matches the full set of actual database records
+    page_1_of_2_db_users_list = get_users_as_list_of_dict(page_1_of_2_db_users)
+    page_2_of_2_db_users_list = get_users_as_list_of_dict(page_2_of_2_db_users)
+    assert [*page_1_of_2_db_users_list, *page_2_of_2_db_users_list] == expected_user_list
 
     # Verify that each pagination produces the correct limit amount
-    assert len(page_1_of_4_db_users_results) == 50
-    assert len(page_2_of_4_db_users_results) == 50
-    assert len(page_3_of_4_db_users_results) == 50
-    assert len(page_4_of_4_db_users_results) == 50
+    assert len(page_1_of_4_db_users) == 50
+    assert len(page_2_of_4_db_users) == 50
+    assert len(page_3_of_4_db_users) == 50
+    assert len(page_4_of_4_db_users) == 50
     # Verify that the boundary results are not repeated
-    assert page_1_of_4_db_users_results[49].to_dict() != page_2_of_4_db_users_results[0].to_dict()
-    assert page_2_of_4_db_users_results[49].to_dict() != page_3_of_4_db_users_results[0].to_dict()
-    assert page_3_of_4_db_users_results[49].to_dict() != page_4_of_4_db_users_results[0].to_dict()
+    assert page_1_of_4_db_users[49].to_dict() != page_2_of_4_db_users[0].to_dict()
+    assert page_2_of_4_db_users[49].to_dict() != page_3_of_4_db_users[0].to_dict()
+    assert page_3_of_4_db_users[49].to_dict() != page_4_of_4_db_users[0].to_dict()
+    # Verify that combining the paginated database users matches the full set of actual database records
+    page_1_of_4_db_users_list = get_users_as_list_of_dict(page_1_of_4_db_users)
+    page_2_of_4_db_users_list = get_users_as_list_of_dict(page_2_of_4_db_users)
+    page_3_of_4_db_users_list = get_users_as_list_of_dict(page_3_of_4_db_users)
+    page_4_of_4_db_users_list = get_users_as_list_of_dict(page_4_of_4_db_users)
+    assert [
+        *page_1_of_4_db_users_list,
+        *page_2_of_4_db_users_list,
+        *page_3_of_4_db_users_list,
+        *page_4_of_4_db_users_list,
+    ] == expected_user_list
 
     # Verify that boundary results are the same between function calls with different params
-    assert page_1_of_2_db_users_results[0].to_dict() == page_1_of_4_db_users_results[0].to_dict()
-    assert page_1_of_2_db_users_results[49].to_dict() == page_1_of_4_db_users_results[49].to_dict()
-    assert page_1_of_2_db_users_results[50].to_dict() == page_2_of_4_db_users_results[0].to_dict()
-    assert page_1_of_2_db_users_results[99].to_dict() == page_2_of_4_db_users_results[49].to_dict()
+    assert page_1_of_2_db_users[0].to_dict() == page_1_of_4_db_users[0].to_dict()
+    assert page_1_of_2_db_users[49].to_dict() == page_1_of_4_db_users[49].to_dict()
+    assert page_1_of_2_db_users[50].to_dict() == page_2_of_4_db_users[0].to_dict()
+    assert page_1_of_2_db_users[99].to_dict() == page_2_of_4_db_users[49].to_dict()
 
-    assert page_2_of_2_db_users_results[0].to_dict() == page_3_of_4_db_users_results[0].to_dict()
-    assert page_2_of_2_db_users_results[49].to_dict() == page_3_of_4_db_users_results[49].to_dict()
-    assert page_2_of_2_db_users_results[50].to_dict() == page_4_of_4_db_users_results[0].to_dict()
-    assert page_2_of_2_db_users_results[99].to_dict() == page_4_of_4_db_users_results[49].to_dict()
+    assert page_2_of_2_db_users[0].to_dict() == page_3_of_4_db_users[0].to_dict()
+    assert page_2_of_2_db_users[49].to_dict() == page_3_of_4_db_users[49].to_dict()
+    assert page_2_of_2_db_users[50].to_dict() == page_4_of_4_db_users[0].to_dict()
+    assert page_2_of_2_db_users[99].to_dict() == page_4_of_4_db_users[49].to_dict()
 
-    # Verify that combining the 2 results gives the full set
-    # @todo check the results obtained against the expected results
-    # assert set(page_1_of_2_db_users_results).union(page_2_of_2_db_users_results) == set(expected_users)
+
+def test_get_users_when_no_users_are_present(db_session: Session):
+    """Test getting users when no users are present in the database."""
+    # When
+    users_1 = get_users(db_session)
+    users_2 = get_users(db_session, offset=100)
+    users_3 = get_users(db_session, offset=7, limit=3)
+
+    # Then
+    assert users_1 == []
+    assert users_2 == []
+    assert users_3 == []
