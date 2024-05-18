@@ -73,7 +73,11 @@ jobs:
           DEBUG_TEST_DATABASE: False
         run: |
           source .venv/bin/activate
-          pytest --junitxml=data/pytest.xml --cov-report=term-missing:skip-covered --cov=. | tee data/pytest-coverage.txt
+          set -o pipefail
+          pytest --cov=./ \
+            --junitxml=data/pytest.xml \
+            --cov-report=term-missing:skip-covered \
+            | tee data/pytest-coverage.txt
 
       - name: Pytest coverage comment
         id: coverageComment
