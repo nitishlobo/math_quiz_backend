@@ -29,11 +29,11 @@ class CreateUserService(CreateUserBase):
 class UpdateUserBase(BaseModel):
     """Common fields between update user service and request."""
 
-    first_name: str | None
-    last_name: str | None
-    email: str | None
+    first_name: str | None = None
+    last_name: str | None = None
+    email: str | None = None
     is_superuser: bool | None = None
-    password: str | None
+    password: str | None = None
 
 
 class UpdateUserService(UpdateUserBase):

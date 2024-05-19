@@ -7,7 +7,7 @@ from collections.abc import Generator
 from uuid import uuid4
 
 import pytest
-from sqlalchemy import RootTransaction, create_engine, event
+from sqlalchemy import RootTransaction, create_engine, event, text
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
@@ -59,6 +59,8 @@ def fixture_db_session(_testing_db: Generator[None, None, None]):
     db_transaction = db_connection.begin()
     db_session = TestingDbSessionLocal(bind=db_connection)
 
+    # Set database timezone to UTC
+    db_session.execute(text("SET TIME ZONE 'UTC'"))
     # Attach factories to the current session
     add_database_model_factories_to_db_session(db_session)
 

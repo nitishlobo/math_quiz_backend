@@ -31,9 +31,14 @@ def get_user_from_email(db_session: Session, email: str) -> User | None:
 
 
 def get_users(db_session: Session, offset: int = 0, limit: int = 100) -> list[User]:
-    """Return users based on the offset and limit restriction applied."""
-    # @todo sort by first name so that the order is always the same
-    return db_session.query(User).offset(offset).limit(limit).all()
+    """Return users sorted by first, then last name, then id and also based on the offset and limit restriction."""
+    return (
+        db_session.query(User)
+        .order_by(User.first_name.asc(), User.last_name.asc(), User.id_.asc())
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
 
 
 def update_user(db_session: Session, user_id: UUID, user: UpdateUserService) -> User | None:
@@ -48,5 +53,5 @@ def update_user(db_session: Session, user_id: UUID, user: UpdateUserService) -> 
 
 
 def soft_delete_user(db_session: Session, user_id: UUID) -> None:
-    """Delete user using user id."""
-    db_session.query(User).filter_by(id_=user_id).update({"deleted": datetime.now(timezone.utc)})
+    """Soft delete a user using user id."""
+    db_session.query(User).filter_by(id_=user_id).update({"deleted_at": datetime.now(timezone.utc)})
