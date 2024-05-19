@@ -2,6 +2,7 @@
 
 import uuid
 from collections.abc import Sequence
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import pytest
@@ -10,8 +11,15 @@ from sqlalchemy.orm import Session
 
 from v1.database.models.test_factories.users import UserFactory
 from v1.database.models.users import User
-from v1.schemas.users import CreateUserRequest, CreateUserService
-from v1.services.users import create_user, get_user_from_email, get_user_from_id, get_users
+from v1.schemas.users import CreateUserRequest, CreateUserService, UpdateUserService
+from v1.services.users import (
+    create_user,
+    get_user_from_email,
+    get_user_from_id,
+    get_users,
+    soft_delete_user,
+    update_user,
+)
 
 
 def test_create_user(db_session: Session, create_user_request: CreateUserRequest):
@@ -45,7 +53,7 @@ def test_get_user_from_id(db_session: Session):
     db_session.commit()
 
     # When
-    db_user = get_user_from_id(db_session, user.id_)
+    db_user = get_user_from_id(db_session, user_id=user.id_)
 
     # Then
     assert db_user is not None
@@ -61,7 +69,7 @@ def test_get_user_from_id_using_an_id_that_does_not_match_any_user(db_session: S
     random_id = uuid.uuid4()
 
     # When
-    db_user = get_user_from_id(db_session, random_id)
+    db_user = get_user_from_id(db_session, user_id=random_id)
 
     # Then
     assert db_user is None
@@ -74,7 +82,7 @@ def test_get_user_from_email(db_session: Session):
     db_session.commit()
 
     # When
-    db_user = get_user_from_email(db_session, user.email)
+    db_user = get_user_from_email(db_session, email=user.email)
 
     # Then
     assert db_user is not None
@@ -90,7 +98,7 @@ def test_get_user_from_email_using_an_email_that_does_not_match_any_user(db_sess
     random_email = f"jane.doe.{str(uuid.uuid4()).replace('-', '')}"
 
     # When
-    db_user = get_user_from_email(db_session, random_email)
+    db_user = get_user_from_email(db_session, email=random_email)
 
     # Then
     assert db_user is None
@@ -185,3 +193,142 @@ def test_get_users_when_no_users_are_present(db_session: Session):
     assert users_1 == []
     assert users_2 == []
     assert users_3 == []
+
+
+def test_update_user(db_session: Session):
+    """Test update user."""
+    # Given
+    user_1 = UserFactory(first_name="Mary", last_name="Magdela", is_superuser=False)
+    user_2 = UserFactory(first_name="Flora", last_name="Sarason", is_superuser=True)
+    user_3 = UserFactory(first_name="Teresa", last_name="Alejandra", is_superuser=False)
+    db_session.commit()
+    # Get passwords before request, as PasswordHasher changes these objects (possible bug)
+    user_1_hashed_password = user_1.hashed_password
+    user_2_hashed_password = user_2.hashed_password
+    user_3_hashed_password = user_3.hashed_password
+    # Allow for slight variance between system clock and database clock (i.e. use timedelta)
+    datetime_before_request = datetime.now(timezone.utc) - timedelta(minutes=1)
+
+    # When
+    user_1_update = UpdateUserService(last_name="Salvae", is_superuser=True)
+    user_2_update = UpdateUserService(email="flora123solace@yahoo.com")
+    user_3_update = UpdateUserService(password="MySuperCoolPassword@789!!")
+    db_user_1 = update_user(db_session, user_id=user_1.id_, user=user_1_update)
+    db_user_2 = update_user(db_session, user_id=user_2.id_, user=user_2_update)
+    db_user_3 = update_user(db_session, user_id=user_3.id_, user=user_3_update)
+    datetime_after_request = datetime.now(timezone.utc) + timedelta(minutes=1)
+
+    # Then
+    # Verify fields on user 1 that should not be changed
+    assert db_user_1 is not None
+    assert db_user_1.id_ == user_1.id_
+    assert db_user_1.first_name == user_1.first_name
+    assert db_user_1.email == user_1.email
+    assert db_user_1.hashed_password == user_1_hashed_password
+    assert db_user_1.created_at == user_1.created_at
+    assert db_user_1.deleted_at is None
+    # Verify fields on user 1 that should be changed
+    assert db_user_1.last_name == user_1_update.last_name
+    assert db_user_1.is_superuser == user_1_update.is_superuser
+    assert db_user_1.updated_at > datetime_before_request
+    assert db_user_1.updated_at < datetime_after_request
+
+    # Verify fields on user 2 that should not be changed
+    assert db_user_2 is not None
+    assert db_user_2.id_ == user_2.id_
+    assert db_user_2.first_name == user_2.first_name
+    assert db_user_2.last_name == user_2.last_name
+    assert db_user_2.hashed_password == user_2_hashed_password
+    assert db_user_2.is_superuser == user_2.is_superuser
+    assert db_user_2.created_at == user_2.created_at
+    assert db_user_2.deleted_at is None
+    # Verify fields on user 2 that should be changed
+    assert db_user_2.email == user_2_update.email
+    assert db_user_2.updated_at > datetime_before_request
+    assert db_user_2.updated_at < datetime_after_request
+
+    # Verify fields on user 3 that should not be changed
+    assert db_user_3 is not None
+    assert db_user_3.id_ == user_3.id_
+    assert db_user_3.first_name == user_3.first_name
+    assert db_user_3.last_name == user_3.last_name
+    assert db_user_3.email == user_3.email
+    assert db_user_3.is_superuser == user_3.is_superuser
+    assert db_user_3.created_at == user_3.created_at
+    assert db_user_3.deleted_at is None
+    # Verify fields on user 3 that should be changed
+    assert db_user_3.hashed_password != user_3_hashed_password
+    assert db_user_3.updated_at > datetime_before_request
+    assert db_user_3.updated_at < datetime_after_request
+
+
+def test_update_user_with_a_user_id_that_does_not_match_any_users(db_session: Session):
+    """Test update user when user id does not match any user."""
+    # Given
+    UserFactory(first_name="Mary", last_name="Magdela", is_superuser=False)
+    db_session.commit()
+
+    # When
+    user_1_update = UpdateUserService(last_name="Salvae", is_superuser=True)
+    # Enter in a random user id
+    db_user = update_user(db_session, user_id=uuid.uuid4(), user=user_1_update)
+
+    # Then
+    assert db_user is None
+
+
+def test_soft_delete_user(db_session: Session):
+    """Test soft deleting a user."""
+    # Given
+    user = UserFactory(first_name="Mary", last_name="Magdela", is_superuser=False)
+    db_session.commit()
+    user_hashed_password = user.hashed_password
+    # Allow for slight variance between system clock and database clock (i.e. use timedelta)
+    datetime_before_request = datetime.now(timezone.utc) - timedelta(minutes=1)
+
+    # When
+    soft_delete_user(db_session, user.id_)
+    datetime_after_request = datetime.now(timezone.utc) + timedelta(minutes=1)
+
+    # Then
+    db_user = db_session.get(User, user.id_)
+    # Verify fields on user that should not be changed
+    assert db_user is not None
+    assert db_user.id_ == user.id_
+    assert db_user.first_name == user.first_name
+    assert db_user.last_name == user.last_name
+    assert db_user.email == user.email
+    assert db_user.hashed_password == user_hashed_password
+    assert db_user.is_superuser == user.is_superuser
+    assert db_user.created_at == user.created_at
+    assert db_user.updated_at == user.updated_at
+    # Verify fields on user that should be changed
+    assert db_user.deleted_at is not None
+    assert db_user.deleted_at > datetime_before_request
+    assert db_user.deleted_at < datetime_after_request
+
+
+def test_soft_delete_user_with_a_user_id_that_does_not_match_any_users(db_session: Session):
+    """Test soft deleting a user with user id that does not match any user."""
+    # Given
+    user = UserFactory(first_name="Mary", last_name="Magdela", is_superuser=False)
+    db_session.commit()
+    user_hashed_password = user.hashed_password
+
+    # When
+    # Enter in a random user id
+    soft_delete_user(db_session, user_id=uuid.uuid4())
+
+    # Then
+    db_user = db_session.get(User, user.id_)
+    # Verify that all fields on user remain the same as they were before the request
+    assert db_user is not None
+    assert db_user.id_ == user.id_
+    assert db_user.first_name == user.first_name
+    assert db_user.last_name == user.last_name
+    assert db_user.email == user.email
+    assert db_user.hashed_password == user_hashed_password
+    assert db_user.is_superuser == user.is_superuser
+    assert db_user.created_at == user.created_at
+    assert db_user.updated_at == user.updated_at
+    assert db_user.deleted_at is None
