@@ -45,7 +45,7 @@ def upgrade() -> None:
         """CREATE OR REPLACE FUNCTION trigger_function__modify_updated_at_to_current_timestamp()
             RETURNS TRIGGER AS $$
             BEGIN
-                NEW.updated = TIMEZONE('utc', CURRENT_TIMESTAMP);
+                NEW.updated_at = TIMEZONE('utc', CURRENT_TIMESTAMP);
                 RETURN NEW;
             END;
             $$ LANGUAGE plpgsql;

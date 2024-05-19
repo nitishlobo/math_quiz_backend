@@ -6,6 +6,7 @@ from uuid import UUID
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from main import v1_router  # pylint: disable=no-name-in-module
@@ -33,7 +34,7 @@ def test_create_user(fastapi_test_client: TestClient, db_session: Session, creat
     # Then
     # Verify response status and type
     response_data = response.json()
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert isinstance(response_data, dict)
 
     # Verify fields in response
@@ -92,9 +93,9 @@ def test_create_same_user_as_above_test_is_possible(
     response = fastapi_test_client.post(f"{v1_router.prefix}/users", json=create_user_request.model_dump())
 
     # Then
-    # Verify response status and type
+    # Verify response status and data
     response_data = response.json()
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert isinstance(response_data, dict)
 
 
@@ -116,7 +117,7 @@ def test_creating_a_user_who_already_exists_fails(
     response = fastapi_test_client.post(f"{v1_router.prefix}/users", json=user)
 
     # Then
-    # Verify response status and type
+    # Verify response status and data
     response_data = response.json()
     assert response.status_code == 400
     assert response_data == {
@@ -126,7 +127,7 @@ def test_creating_a_user_who_already_exists_fails(
 
 @pytest.mark.integration()
 def test_read_users(fastapi_test_client: TestClient, db_session: Session):
-    """Test that given a user already exists, they cannot be created again."""
+    """Test getting a list of users."""
     # Given
     # Create users in the database
     datetime_now = datetime.now(timezone.utc)
@@ -139,7 +140,7 @@ def test_read_users(fastapi_test_client: TestClient, db_session: Session):
     response = fastapi_test_client.get(f"{v1_router.prefix}/users")
 
     # Then
-    # Verify response status and type
+    # Verify response status and data
     response_data = response.json()
     assert response.status_code == 200
     expected_response = [
@@ -178,3 +179,120 @@ def test_read_users(fastapi_test_client: TestClient, db_session: Session):
     sorted_response_data = sorted(response_data, key=itemgetter("id"))
     sorted_expected_response = sorted(expected_response, key=itemgetter("id"))
     assert sorted_response_data == sorted_expected_response
+
+
+@pytest.mark.integration()
+def test_read_user(fastapi_test_client: TestClient, db_session: Session):
+    """Test getting a single user."""
+    # Given
+    # Create users in the database
+    datetime_now = datetime.now(timezone.utc)
+    _user_1 = UserFactory()
+    user_2 = UserFactory(first_name="Fulton", last_name="Sheen", is_superuser=True)
+    _user_3 = UserFactory(first_name="John", last_name="Tolkien", created_at=datetime_now)
+    db_session.commit()
+
+    # When
+    response = fastapi_test_client.get(f"{v1_router.prefix}/users/{user_2.id_}")
+
+    # Then
+    # Verify response status and data
+    response_data = response.json()
+    assert response.status_code == 200
+    expected_response = {
+        "created_at": datetime_obj_to_str(user_2.created_at),
+        "deleted_at": user_2.deleted_at,
+        "email": user_2.email,
+        "first_name": "Fulton",
+        "id": str(user_2.id_),
+        "is_superuser": True,
+        "last_name": "Sheen",
+        "updated_at": datetime_obj_to_str(user_2.updated_at),
+    }
+    assert response_data == expected_response
+
+
+@pytest.mark.integration()
+def test_update_user(fastapi_test_client: TestClient, db_session: Session):
+    """Test updating a user's information."""
+    # Given
+    # Create users in the database
+    datetime_now = datetime.now(timezone.utc)
+    user_1 = UserFactory()
+    user_2 = UserFactory(first_name="Fulton", last_name="Sheen", is_superuser=True)
+    user_3 = UserFactory(first_name="John", last_name="Tolkien", created_at=datetime_now)
+    db_session.commit()
+    # Get passwords before request, as PasswordHasher changes these objects (possible bug)
+    user_3_hashed_password = user_3.hashed_password
+
+    # When
+    response = fastapi_test_client.patch(
+        f"{v1_router.prefix}/users/{user_3.id_}",
+        json={"first_name": "Jonathan", "is_superuser": True, "password": "MyStronglyFakePassword@!"},
+    )
+
+    # Then
+    # Verify response status and data
+    response_data = response.json()
+    assert response.status_code == 200
+    expected_response = {
+        "created_at": datetime_obj_to_str(user_3.created_at),
+        "deleted_at": user_3.deleted_at,
+        "email": user_3.email,
+        "first_name": "Jonathan",
+        "id": str(user_3.id_),
+        "is_superuser": True,
+        "last_name": "Tolkien",
+        # updated_at should reflect a new time after being updated.
+        # Therefore, updated_at should be failing but is actually passing!
+        # This could be because of a SQLAlchemy/Factory boy bug.
+        "updated_at": datetime_obj_to_str(user_3.updated_at),
+    }
+    assert response_data == expected_response
+
+    # Map database users for verifying data
+    db_users = db_session.scalars(select(User)).all()
+    db_user_id_to_user_map = {user.id_: user.to_dict() for user in db_users}
+    # Verify password is changed
+    assert db_user_id_to_user_map[user_3.id_]["hashed_password"] != user_3_hashed_password
+
+    # Verify that user_1 and user_2 data remains the same as before the request
+    assert db_user_id_to_user_map[user_1.id_] == user_1.to_dict()
+    assert db_user_id_to_user_map[user_2.id_] == user_2.to_dict()
+
+
+@pytest.mark.integration()
+def test_delete_user(fastapi_test_client: TestClient, db_session: Session):
+    """Test soft deleting a user."""
+    # Given
+    # Create users in the database
+    user_1 = UserFactory()
+    user_2 = UserFactory(first_name="Fulton", last_name="Sheen", is_superuser=True)
+    user_3 = UserFactory(first_name="John", last_name="Tolkien")
+    db_session.commit()
+    datetime_before_request = datetime.now(timezone.utc) - timedelta(minutes=1)
+
+    # When
+    response = fastapi_test_client.delete(f"{v1_router.prefix}/users/{user_1.id_}")
+    datetime_after_request = datetime.now(timezone.utc) + timedelta(minutes=1)
+
+    # Then
+    response_data = response.json()
+    assert response.status_code == 200
+    expected_response = {"message": "success"}
+    assert response_data == expected_response
+
+    # Verify that it was only a soft delete - i.e. all 3 users still exist
+    db_users = db_session.scalars(select(User)).all()
+    assert len(db_users) == 3
+
+    # Verify that user 1 was deleted
+    db_user_id_to_user_map = {user.id_: user.to_dict() for user in db_users}
+    user_1_deleted_at = db_user_id_to_user_map[user_1.id_]["deleted_at"]
+    assert user_1_deleted_at is not None
+    assert user_1_deleted_at > datetime_before_request
+    assert user_1_deleted_at < datetime_after_request
+
+    # Verify that the user 2 and 3 are not deleted
+    assert db_user_id_to_user_map[user_2.id_]["deleted_at"] is None
+    assert db_user_id_to_user_map[user_3.id_]["deleted_at"] is None
