@@ -31,9 +31,13 @@ def get_user_from_email(db_session: Session, email: str) -> User | None:
 
 
 def get_users(db_session: Session, offset: int = 0, limit: int = 100) -> list[User]:
-    """Return users sorted by first and last name and also based on the offset and limit restriction."""
+    """Return users sorted by first, then last name, then id and also based on the offset and limit restriction."""
     return (
-        db_session.query(User).order_by(User.first_name.asc(), User.last_name.asc()).offset(offset).limit(limit).all()
+        db_session.query(User)
+        .order_by(User.first_name.asc(), User.last_name.asc(), User.id_.asc())
+        .offset(offset)
+        .limit(limit)
+        .all()
     )
 
 

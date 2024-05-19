@@ -111,7 +111,9 @@ def test_get_users(db_session: Session):
     # Create 200 users
     UserFactory.create_batch(200)
     db_session.commit()
-    expected_users = db_session.scalars(select(User).order_by(User.first_name.asc(), User.last_name.asc())).all()
+    expected_users = db_session.scalars(
+        select(User).order_by(User.first_name.asc(), User.last_name.asc(), User.id_.asc()),
+    ).all()
     expected_user_list = get_users_as_list_of_dict(expected_users)
 
     # When
