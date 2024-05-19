@@ -35,7 +35,7 @@ def read_user(db_session: DbSession, user_id: UUID) -> User | None:
 @router.patch("/{user_id}", response_model=UserResponse)
 def update_user(db_session: DbSession, user_id: UUID, user: UpdateUserRequest) -> User | None:
     """Return updated user."""
-    return users_service.update_user(db_session, user_id, UpdateUserService(**user.model_dump()))
+    return users_service.update_user(db_session, user_id, UpdateUserService(**user.model_dump(exclude_unset=True)))
 
 
 @router.delete("/{user_id}")
