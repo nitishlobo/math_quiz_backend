@@ -195,7 +195,7 @@ def test_get_users_when_no_users_are_present(db_session: Session):
     assert users_3 == []
 
 
-def test_update_user(db_session: Session):
+def test_update_user(db_session: Session):  # pylint: disable=too-many-statements
     """Test update user."""
     # Given
     user_1 = UserFactory(first_name="Mary", last_name="Magdela", is_superuser=False)
@@ -213,13 +213,14 @@ def test_update_user(db_session: Session):
     user_1_update = UpdateUserService(last_name="Salvae", is_superuser=True)
     user_2_update = UpdateUserService(email="flora123solace@yahoo.com")
     user_3_update = UpdateUserService(password="MySuperCoolPassword@789!!")
-    db_user_1 = update_user(db_session, user_id=user_1.id_, update_user_data=user_1_update)
-    db_user_2 = update_user(db_session, user_id=user_2.id_, update_user_data=user_2_update)
-    db_user_3 = update_user(db_session, user_id=user_3.id_, update_user_data=user_3_update)
+    update_user(db_session, user=user_1, update_user_data=user_1_update)
+    update_user(db_session, user=user_2, update_user_data=user_2_update)
+    update_user(db_session, user=user_3, update_user_data=user_3_update)
     datetime_after_request = datetime.now(timezone.utc) + timedelta(minutes=1)
 
     # Then
     # Verify fields on user 1 that should not be changed
+    db_user_1 = db_session.get(User, user_1.id_)
     assert db_user_1 is not None
     assert db_user_1.id_ == user_1.id_
     assert db_user_1.first_name == user_1.first_name
@@ -234,6 +235,7 @@ def test_update_user(db_session: Session):
     assert db_user_1.updated_at < datetime_after_request
 
     # Verify fields on user 2 that should not be changed
+    db_user_2 = db_session.get(User, user_2.id_)
     assert db_user_2 is not None
     assert db_user_2.id_ == user_2.id_
     assert db_user_2.first_name == user_2.first_name
@@ -248,6 +250,7 @@ def test_update_user(db_session: Session):
     assert db_user_2.updated_at < datetime_after_request
 
     # Verify fields on user 3 that should not be changed
+    db_user_3 = db_session.get(User, user_3.id_)
     assert db_user_3 is not None
     assert db_user_3.id_ == user_3.id_
     assert db_user_3.first_name == user_3.first_name
@@ -260,21 +263,6 @@ def test_update_user(db_session: Session):
     assert db_user_3.hashed_password != user_3_hashed_password
     assert db_user_3.updated_at > datetime_before_request
     assert db_user_3.updated_at < datetime_after_request
-
-
-def test_update_user_with_a_user_id_that_does_not_match_any_users(db_session: Session):
-    """Test update user when user id does not match any user."""
-    # Given
-    UserFactory(first_name="Mary", last_name="Magdela", is_superuser=False)
-    db_session.commit()
-
-    # When
-    user_1_update = UpdateUserService(last_name="Salvae", is_superuser=True)
-    # Enter in a random user id
-    db_user = update_user(db_session, user_id=uuid.uuid4(), update_user_data=user_1_update)
-
-    # Then
-    assert db_user is None
 
 
 def test_soft_delete_user(db_session: Session):

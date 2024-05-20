@@ -1,6 +1,7 @@
 """User endpoints."""
 
 from collections.abc import Sequence
+from datetime import datetime, timezone
 from http import HTTPStatus
 
 from v1.database.models.users import User
@@ -29,27 +30,29 @@ def read_users(db_session: DbSession, offset: int = 0, limit: int = 100) -> Sequ
     return users_service.get_users(db_session, offset, limit)
 
 
-# @todo add integration test for deleting user who does not exist and check response
 @router.get("/{user_id}", response_model=UserResponse)
 def read_user(user: UserDependency) -> User:
     """Return user belonging to user id."""
     return user
 
 
-# @todo add integration test for deleting user who does not exist and check response
 @router.patch("/{user_id}", response_model=UserResponse)
 def update_user(db_session: DbSession, user: UserDependency, update_user_data: UpdateUserRequest) -> User | None:
     """Return updated user."""
-    return users_service.update_user(
+    users_service.update_user(
         db_session,
-        user.id_,
-        UpdateUserService(**update_user_data.model_dump(exclude_unset=True)),
+        user,
+        update_user_data=UpdateUserService(**update_user_data.model_dump(exclude_unset=True)),
     )
+    return users_service.get_user_from_id(db_session, user_id=user.id_)
 
 
-# @todo add integration test for deleting user who does not exist and check response
 @router.delete("/{user_id}", response_model=DeleteResponse)
 def soft_delete_user(db_session: DbSession, user: UserDependency) -> DeleteResponse:
     """Return success message on delete."""
-    users_service.soft_delete_user(db_session, user.id_)
+    users_service.update_user(
+        db_session,
+        user,
+        update_user_data=UpdateUserService(deleted_at=datetime.now(timezone.utc)),
+    )
     return DeleteResponse()
