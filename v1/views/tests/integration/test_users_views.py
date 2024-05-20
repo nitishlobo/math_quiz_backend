@@ -1,5 +1,6 @@
 """Test module for user router."""
 
+import uuid
 from datetime import datetime, timedelta, timezone
 from operator import itemgetter
 from uuid import UUID
@@ -230,6 +231,32 @@ def test_read_user(fastapi_test_client: TestClient, db_session: Session):
         "updated_at": datetime_obj_to_str(user_2.updated_at),
     }
     assert response_data == expected_response
+
+
+@pytest.mark.integration()
+def test_read_user_with_a_user_id_which_does_not_match_any_users_fails(
+    fastapi_test_client: TestClient,
+    db_session: Session,
+):
+    """Test getting a user with an id that does not match any users fails."""
+    # Given
+    # Create 3 users in the database
+    datetime_now = datetime.now(timezone.utc)
+    UserFactory()
+    UserFactory(first_name="Fulton", last_name="Sheen", is_superuser=True)
+    UserFactory(first_name="John", last_name="Tolkien", created_at=datetime_now)
+    db_session.commit()
+
+    # When
+    # Create a random id that does not match any users
+    random_user_id = str(uuid.uuid4())
+    response = fastapi_test_client.get(f"{v1_router.prefix}/users/{random_user_id}")
+
+    # Then
+    # Verify response status and data
+    response_data = response.json()
+    assert response.status_code == 400
+    assert response_data == {"message": f"User id {random_user_id} does not exist."}
 
 
 @pytest.mark.integration()

@@ -38,13 +38,13 @@ def get_users(db_session: Session, offset: int = 0, limit: int = 100) -> Sequenc
     ).all()
 
 
-def update_user(db_session: Session, user_id: UUID, user: UpdateUserService) -> User | None:
+def update_user(db_session: Session, user_id: UUID, update_user_data: UpdateUserService) -> User | None:
     """Return updated user."""
-    user_data = user.model_dump(exclude={"password"}, exclude_unset=True)
-    if user.password:
-        user_data["hashed_password"] = common_services.hash_password(user.password)
+    update_user_dict = update_user_data.model_dump(exclude={"password"}, exclude_unset=True)
+    if update_user_data.password:
+        update_user_dict["hashed_password"] = common_services.hash_password(update_user_data.password)
 
-    db_session.execute(update(User).where(User.id_ == user_id).values(**user_data))
+    db_session.execute(update(User).where(User.id_ == user_id).values(**update_user_dict))
     db_session.commit()
     return get_user_from_id(db_session, user_id)
 

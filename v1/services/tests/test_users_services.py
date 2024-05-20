@@ -213,9 +213,9 @@ def test_update_user(db_session: Session):
     user_1_update = UpdateUserService(last_name="Salvae", is_superuser=True)
     user_2_update = UpdateUserService(email="flora123solace@yahoo.com")
     user_3_update = UpdateUserService(password="MySuperCoolPassword@789!!")
-    db_user_1 = update_user(db_session, user_id=user_1.id_, user=user_1_update)
-    db_user_2 = update_user(db_session, user_id=user_2.id_, user=user_2_update)
-    db_user_3 = update_user(db_session, user_id=user_3.id_, user=user_3_update)
+    db_user_1 = update_user(db_session, user_id=user_1.id_, update_user_data=user_1_update)
+    db_user_2 = update_user(db_session, user_id=user_2.id_, update_user_data=user_2_update)
+    db_user_3 = update_user(db_session, user_id=user_3.id_, update_user_data=user_3_update)
     datetime_after_request = datetime.now(timezone.utc) + timedelta(minutes=1)
 
     # Then
@@ -271,7 +271,7 @@ def test_update_user_with_a_user_id_that_does_not_match_any_users(db_session: Se
     # When
     user_1_update = UpdateUserService(last_name="Salvae", is_superuser=True)
     # Enter in a random user id
-    db_user = update_user(db_session, user_id=uuid.uuid4(), user=user_1_update)
+    db_user = update_user(db_session, user_id=uuid.uuid4(), update_user_data=user_1_update)
 
     # Then
     assert db_user is None
