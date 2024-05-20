@@ -296,3 +296,6 @@ def test_delete_user(fastapi_test_client: TestClient, db_session: Session):
     # Verify that the user 2 and 3 are not deleted
     assert db_user_id_to_user_map[user_2.id_]["deleted_at"] is None
     assert db_user_id_to_user_map[user_3.id_]["deleted_at"] is None
+
+
+# @todo add an integration test for deleting a user that's already been deleted
