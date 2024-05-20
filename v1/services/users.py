@@ -1,8 +1,10 @@
 """Users service."""
 
+from collections.abc import Sequence
 from datetime import datetime, timezone
 from uuid import UUID
 
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from v1.database.models.users import User
@@ -21,24 +23,19 @@ def create_user(db_session: Session, user: CreateUserService) -> User:
 
 def get_user_from_id(db_session: Session, user_id: UUID) -> User | None:
     """Return user model object from user id."""
-    # @todo change query style to SQLAlchemy 2.0
-    return db_session.query(User).filter(User.id_ == user_id).first()
+    return db_session.get(User, user_id)
 
 
 def get_user_from_email(db_session: Session, email: str) -> User | None:
     """Return user by email."""
-    return db_session.query(User).filter(User.email == email).first()
+    return db_session.execute(select(User).filter_by(email=email)).scalar_one_or_none()
 
 
-def get_users(db_session: Session, offset: int = 0, limit: int = 100) -> list[User]:
+def get_users(db_session: Session, offset: int = 0, limit: int = 100) -> Sequence[User]:
     """Return users sorted by first, then last name, then id and also based on the offset and limit restriction."""
-    return (
-        db_session.query(User)
-        .order_by(User.first_name.asc(), User.last_name.asc(), User.id_.asc())
-        .offset(offset)
-        .limit(limit)
-        .all()
-    )
+    return db_session.scalars(
+        select(User).order_by(User.first_name.asc(), User.last_name.asc(), User.id_.asc()).offset(offset).limit(limit),
+    ).all()
 
 
 def update_user(db_session: Session, user_id: UUID, user: UpdateUserService) -> User | None:
@@ -47,11 +44,11 @@ def update_user(db_session: Session, user_id: UUID, user: UpdateUserService) -> 
     if user.password:
         user_data["hashed_password"] = common_services.hash_password(user.password)
 
-    db_session.query(User).filter_by(id_=user_id).update(user_data)
+    db_session.execute(update(User).where(User.id_ == user_id).values(**user_data))
     db_session.commit()
     return get_user_from_id(db_session, user_id)
 
 
 def soft_delete_user(db_session: Session, user_id: UUID) -> None:
     """Soft delete a user using user id."""
-    db_session.query(User).filter_by(id_=user_id).update({"deleted_at": datetime.now(timezone.utc)})
+    db_session.execute(update(User).where(User.id_ == user_id).values(deleted_at=datetime.now(timezone.utc)))
