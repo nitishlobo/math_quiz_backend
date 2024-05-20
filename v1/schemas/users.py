@@ -1,11 +1,14 @@
 """User schemas."""
 
 from datetime import datetime
+from typing import Annotated
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AfterValidator, BaseModel, ConfigDict, Field
 
-# @todo add validator for all email fields
+from v1.services.emails import validate_and_normalize_email
+
+Email = Annotated[str, AfterValidator(validate_and_normalize_email)]
 
 
 class CreateUserBase(BaseModel):
@@ -13,7 +16,7 @@ class CreateUserBase(BaseModel):
 
     first_name: str
     last_name: str
-    email: str
+    email: Email
     is_superuser: bool
     password: str
 
@@ -31,7 +34,7 @@ class UpdateUserBase(BaseModel):
 
     first_name: str | None = None
     last_name: str | None = None
-    email: str | None = None
+    email: Email | None = None
     is_superuser: bool | None = None
     password: str | None = None
 

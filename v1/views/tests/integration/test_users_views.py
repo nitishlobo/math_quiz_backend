@@ -100,6 +100,26 @@ def test_create_same_user_as_above_test_is_possible(
 
 
 @pytest.mark.integration()
+def test_create_user_with_an_invalid_email_address_fails(
+    fastapi_test_client: TestClient,
+    create_user_request: CreateUserRequest,
+):
+    """Test creating an user with an invalid email address fails."""
+    # Given
+    user_request = create_user_request
+    user_request.email = "florence..faolluiere@gmail.com"
+
+    # When
+    response = fastapi_test_client.post(f"{v1_router.prefix}/users", json=user_request.model_dump())
+
+    # Then
+    # Verify response status and type
+    response_data = response.json()
+    assert response.status_code == 422
+    assert isinstance(response_data, dict)
+
+
+@pytest.mark.integration()
 def test_creating_a_user_who_already_exists_fails(
     fastapi_test_client: TestClient,
     db_session: Session,
@@ -259,6 +279,26 @@ def test_update_user(fastapi_test_client: TestClient, db_session: Session):
     # Verify that user_1 and user_2 data remains the same as before the request
     assert db_user_id_to_user_map[user_1.id_] == user_1.to_dict()
     assert db_user_id_to_user_map[user_2.id_] == user_2.to_dict()
+
+
+@pytest.mark.integration()
+def test_update_user_with_an_invalid_email_address_fails(fastapi_test_client: TestClient, db_session: Session):
+    """Test updating a user using an invalide email address fails."""
+    # Given
+    user = UserFactory(first_name="Fulton", last_name="Sheen", email="fulton.sheen@gmail.com")
+    db_session.commit()
+
+    # When
+    response = fastapi_test_client.patch(
+        f"{v1_router.prefix}/users/{user.id_}",
+        json={"email": "fulton.sheen@elpaso-university.com"},
+    )
+
+    # Then
+    # Verify response status and data
+    response_data = response.json()
+    assert response.status_code == 422
+    assert isinstance(response_data, dict)
 
 
 @pytest.mark.integration()
