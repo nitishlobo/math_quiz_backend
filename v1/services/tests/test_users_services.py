@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from v1.database.models.test_factories.users import UserFactory
 from v1.database.models.users import User
+from v1.exceptions.users import UserHasBeenPreviouslyDeletedError
 from v1.schemas.users import CreateUserRequest, CreateUserService, UpdateUserService
 from v1.services.users import (
     create_user,
@@ -18,7 +19,7 @@ from v1.services.users import (
     get_user_from_id,
     get_users,
     soft_delete_user,
-    update_user,
+    update_user_using_id,
 )
 
 
@@ -195,7 +196,7 @@ def test_get_users_when_no_users_are_present(db_session: Session):
     assert users_3 == []
 
 
-def test_update_user(db_session: Session):
+def test_update_user(db_session: Session):  # pylint: disable=too-many-statements
     """Test update user."""
     # Given
     user_1 = UserFactory(first_name="Mary", last_name="Magdela", is_superuser=False)
@@ -213,13 +214,14 @@ def test_update_user(db_session: Session):
     user_1_update = UpdateUserService(last_name="Salvae", is_superuser=True)
     user_2_update = UpdateUserService(email="flora123solace@yahoo.com")
     user_3_update = UpdateUserService(password="MySuperCoolPassword@789!!")
-    db_user_1 = update_user(db_session, user_id=user_1.id_, user=user_1_update)
-    db_user_2 = update_user(db_session, user_id=user_2.id_, user=user_2_update)
-    db_user_3 = update_user(db_session, user_id=user_3.id_, user=user_3_update)
+    update_user_using_id(db_session, user_id=user_1.id_, update_user_data=user_1_update)
+    update_user_using_id(db_session, user_id=user_2.id_, update_user_data=user_2_update)
+    update_user_using_id(db_session, user_id=user_3.id_, update_user_data=user_3_update)
     datetime_after_request = datetime.now(timezone.utc) + timedelta(minutes=1)
 
     # Then
     # Verify fields on user 1 that should not be changed
+    db_user_1 = db_session.get(User, user_1.id_)
     assert db_user_1 is not None
     assert db_user_1.id_ == user_1.id_
     assert db_user_1.first_name == user_1.first_name
@@ -234,6 +236,7 @@ def test_update_user(db_session: Session):
     assert db_user_1.updated_at < datetime_after_request
 
     # Verify fields on user 2 that should not be changed
+    db_user_2 = db_session.get(User, user_2.id_)
     assert db_user_2 is not None
     assert db_user_2.id_ == user_2.id_
     assert db_user_2.first_name == user_2.first_name
@@ -248,6 +251,7 @@ def test_update_user(db_session: Session):
     assert db_user_2.updated_at < datetime_after_request
 
     # Verify fields on user 3 that should not be changed
+    db_user_3 = db_session.get(User, user_3.id_)
     assert db_user_3 is not None
     assert db_user_3.id_ == user_3.id_
     assert db_user_3.first_name == user_3.first_name
@@ -262,21 +266,6 @@ def test_update_user(db_session: Session):
     assert db_user_3.updated_at < datetime_after_request
 
 
-def test_update_user_with_a_user_id_that_does_not_match_any_users(db_session: Session):
-    """Test update user when user id does not match any user."""
-    # Given
-    UserFactory(first_name="Mary", last_name="Magdela", is_superuser=False)
-    db_session.commit()
-
-    # When
-    user_1_update = UpdateUserService(last_name="Salvae", is_superuser=True)
-    # Enter in a random user id
-    db_user = update_user(db_session, user_id=uuid.uuid4(), user=user_1_update)
-
-    # Then
-    assert db_user is None
-
-
 def test_soft_delete_user(db_session: Session):
     """Test soft deleting a user."""
     # Given
@@ -287,7 +276,7 @@ def test_soft_delete_user(db_session: Session):
     datetime_before_request = datetime.now(timezone.utc) - timedelta(minutes=1)
 
     # When
-    soft_delete_user(db_session, user.id_)
+    soft_delete_user(db_session, user)
     datetime_after_request = datetime.now(timezone.utc) + timedelta(minutes=1)
 
     # Then
@@ -308,27 +297,19 @@ def test_soft_delete_user(db_session: Session):
     assert db_user.deleted_at < datetime_after_request
 
 
-def test_soft_delete_user_with_a_user_id_that_does_not_match_any_users(db_session: Session):
-    """Test soft deleting a user with user id that does not match any user."""
+def test_soft_delete_user_who_has_been_previously_deleted_fails(db_session: Session):
+    """Test soft deleting a user who has been previously deleted fails."""
     # Given
-    user = UserFactory(first_name="Mary", last_name="Magdela", is_superuser=False)
+    user_deleted_at = datetime(2009, 1, 27, 3, 4, 52, 63870, tzinfo=timezone.utc)
+    user = UserFactory(first_name="Mary", last_name="Magdela", is_superuser=False, deleted_at=user_deleted_at)
     db_session.commit()
-    user_hashed_password = user.hashed_password
 
     # When
-    # Enter in a random user id
-    soft_delete_user(db_session, user_id=uuid.uuid4())
+    with pytest.raises(UserHasBeenPreviouslyDeletedError):
+        soft_delete_user(db_session, user)
 
     # Then
     db_user = db_session.get(User, user.id_)
-    # Verify that all fields on user remain the same as they were before the request
+    # Verify fields on user deletion time has not changed
     assert db_user is not None
-    assert db_user.id_ == user.id_
-    assert db_user.first_name == user.first_name
-    assert db_user.last_name == user.last_name
-    assert db_user.email == user.email
-    assert db_user.hashed_password == user_hashed_password
-    assert db_user.is_superuser == user.is_superuser
-    assert db_user.created_at == user.created_at
-    assert db_user.updated_at == user.updated_at
-    assert db_user.deleted_at is None
+    assert db_user.deleted_at == user_deleted_at

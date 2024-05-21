@@ -1,5 +1,6 @@
 """Test module for user router."""
 
+import uuid
 from datetime import datetime, timedelta, timezone
 from operator import itemgetter
 from uuid import UUID
@@ -233,6 +234,32 @@ def test_read_user(fastapi_test_client: TestClient, db_session: Session):
 
 
 @pytest.mark.integration()
+def test_read_user_with_a_user_id_which_does_not_match_any_users_fails(
+    fastapi_test_client: TestClient,
+    db_session: Session,
+):
+    """Test getting a user with an id that does not match any users fails."""
+    # Given
+    # Create 3 users in the database
+    datetime_now = datetime.now(timezone.utc)
+    UserFactory()
+    UserFactory(first_name="Fulton", last_name="Sheen", is_superuser=True)
+    UserFactory(first_name="John", last_name="Tolkien", created_at=datetime_now)
+    db_session.commit()
+
+    # When
+    # Create a random id that does not match any users
+    random_user_id = str(uuid.uuid4())
+    response = fastapi_test_client.get(f"{v1_router.prefix}/users/{random_user_id}")
+
+    # Then
+    # Verify response status and data
+    response_data = response.json()
+    assert response.status_code == 400
+    assert response_data == {"message": f"User id {random_user_id} does not exist."}
+
+
+@pytest.mark.integration()
 def test_update_user(fastapi_test_client: TestClient, db_session: Session):
     """Test updating a user's information."""
     # Given
@@ -279,6 +306,35 @@ def test_update_user(fastapi_test_client: TestClient, db_session: Session):
     # Verify that user_1 and user_2 data remains the same as before the request
     assert db_user_id_to_user_map[user_1.id_] == user_1.to_dict()
     assert db_user_id_to_user_map[user_2.id_] == user_2.to_dict()
+
+
+@pytest.mark.integration()
+def test_update_user_with_a_user_id_which_does_not_match_any_users_fails(
+    fastapi_test_client: TestClient,
+    db_session: Session,
+):
+    """Test updating a user with an id that does not match any users fails."""
+    # Given
+    # Create 3 users in the database
+    datetime_now = datetime.now(timezone.utc)
+    UserFactory()
+    UserFactory(first_name="Fulton", last_name="Sheen", is_superuser=True)
+    UserFactory(first_name="John", last_name="Tolkien", created_at=datetime_now)
+    db_session.commit()
+
+    # When
+    # Create a random id that does not match any users
+    random_user_id = str(uuid.uuid4())
+    response = fastapi_test_client.patch(
+        f"{v1_router.prefix}/users/{random_user_id}",
+        json={"first_name": "Jonathan", "is_superuser": True, "password": "MyStronglyFakePassword@!"},
+    )
+
+    # Then
+    # Verify response status and data
+    response_data = response.json()
+    assert response.status_code == 400
+    assert response_data == {"message": f"User id {random_user_id} does not exist."}
 
 
 @pytest.mark.integration()
@@ -338,4 +394,54 @@ def test_delete_user(fastapi_test_client: TestClient, db_session: Session):
     assert db_user_id_to_user_map[user_3.id_]["deleted_at"] is None
 
 
-# @todo add an integration test for deleting a user that's already been deleted
+@pytest.mark.integration()
+def test_delete_user_who_has_been_previously_deleted_fails(
+    fastapi_test_client: TestClient,
+    db_session: Session,
+):
+    """Test deleting a user who has been previously deleted fails."""
+    # Given
+    # Create 3 users in the database
+    datetime_now = datetime.now(timezone.utc)
+    user_1_deleted_at = datetime(1997, 2, 16, 3, 4, 59, 63870, tzinfo=timezone.utc)
+    user_1 = UserFactory(deleted_at=user_1_deleted_at)
+    UserFactory(first_name="Fulton", last_name="Sheen", is_superuser=True)
+    UserFactory(first_name="John", last_name="Tolkien", created_at=datetime_now)
+    db_session.commit()
+
+    # When
+    response = fastapi_test_client.delete(f"{v1_router.prefix}/users/{user_1.id_}")
+
+    # Then
+    # Verify response status and data
+    response_data = response.json()
+    assert response.status_code == 400
+    assert response_data == {
+        "message": f"User {user_1.email} has been previously deleted at {user_1.deleted_at.isoformat()}.",
+    }
+
+
+@pytest.mark.integration()
+def test_delete_user_with_a_user_id_which_does_not_match_any_users_fails(
+    fastapi_test_client: TestClient,
+    db_session: Session,
+):
+    """Test deleting a user with an id that does not match any users fails."""
+    # Given
+    # Create 3 users in the database
+    datetime_now = datetime.now(timezone.utc)
+    UserFactory()
+    UserFactory(first_name="Fulton", last_name="Sheen", is_superuser=True)
+    UserFactory(first_name="John", last_name="Tolkien", created_at=datetime_now)
+    db_session.commit()
+
+    # When
+    # Create a random id that does not match any users
+    random_user_id = str(uuid.uuid4())
+    response = fastapi_test_client.delete(f"{v1_router.prefix}/users/{random_user_id}")
+
+    # Then
+    # Verify response status and data
+    response_data = response.json()
+    assert response.status_code == 400
+    assert response_data == {"message": f"User id {random_user_id} does not exist."}

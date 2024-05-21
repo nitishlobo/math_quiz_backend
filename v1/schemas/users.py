@@ -6,9 +6,11 @@ from uuid import UUID
 
 from pydantic import AfterValidator, BaseModel, ConfigDict, Field
 
+from v1.services.datetime_ import validate_datetime_is_utc_timezone
 from v1.services.emails import validate_and_normalize_email
 
 Email = Annotated[str, AfterValidator(validate_and_normalize_email)]
+UtcDatetime = Annotated[datetime, AfterValidator(validate_datetime_is_utc_timezone)]
 
 
 class CreateUserBase(BaseModel):
@@ -41,6 +43,8 @@ class UpdateUserBase(BaseModel):
 
 class UpdateUserService(UpdateUserBase):
     """Service model for updating an existing user."""
+
+    deleted_at: UtcDatetime | None = None
 
 
 class UpdateUserRequest(UpdateUserBase):
