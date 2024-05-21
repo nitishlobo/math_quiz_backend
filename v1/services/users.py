@@ -8,6 +8,7 @@ from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from v1.database.models.users import User
+from v1.exceptions.users import UserHasBeenPreviouslyDeletedError
 from v1.schemas.users import CreateUserService, UpdateUserService
 from v1.services import passwords as common_services
 
@@ -48,6 +49,14 @@ def update_user_using_id(db_session: Session, user_id: UUID, update_user_data: U
     db_session.commit()
 
 
-def soft_delete_user(db_session: Session, user_id: UUID) -> None:
+def soft_delete_user(db_session: Session, user: User) -> None:
     """Soft delete a user using user id."""
-    update_user_using_id(db_session, user_id, update_user_data=UpdateUserService(deleted_at=datetime.now(timezone.utc)))
+    # Cannot delete a user who has already been deleted
+    if user.deleted_at is not None:
+        raise UserHasBeenPreviouslyDeletedError(email=user.email, deleted_at=user.deleted_at)
+
+    update_user_using_id(
+        db_session,
+        user.id_,
+        update_user_data=UpdateUserService(deleted_at=datetime.now(timezone.utc)),
+    )

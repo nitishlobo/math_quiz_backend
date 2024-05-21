@@ -1,5 +1,6 @@
 """Exceptions relating to users."""
 
+from datetime import datetime
 from uuid import UUID
 
 from v1.exceptions.base import BaseError
@@ -19,3 +20,12 @@ class UserIdDoesNotExistError(BaseError):
     def __init__(self, id_: UUID) -> None:
         """User id."""
         self.id_ = id_
+
+
+class UserHasBeenPreviouslyDeletedError(BaseError):
+    """Raise error when user had been previously deleted."""
+
+    def __init__(self, email: str, deleted_at: datetime) -> None:
+        """Email is unique for every user."""
+        self.email = email
+        self.deleted_at = deleted_at

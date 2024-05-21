@@ -395,6 +395,33 @@ def test_delete_user(fastapi_test_client: TestClient, db_session: Session):
 
 
 @pytest.mark.integration()
+def test_delete_user_who_has_been_previously_deleted_fails(
+    fastapi_test_client: TestClient,
+    db_session: Session,
+):
+    """Test deleting a user who has been previously deleted fails."""
+    # Given
+    # Create 3 users in the database
+    datetime_now = datetime.now(timezone.utc)
+    user_1_deleted_at = datetime(1997, 2, 16, 3, 4, 59, 63870, tzinfo=timezone.utc)
+    user_1 = UserFactory(deleted_at=user_1_deleted_at)
+    UserFactory(first_name="Fulton", last_name="Sheen", is_superuser=True)
+    UserFactory(first_name="John", last_name="Tolkien", created_at=datetime_now)
+    db_session.commit()
+
+    # When
+    response = fastapi_test_client.delete(f"{v1_router.prefix}/users/{user_1.id_}")
+
+    # Then
+    # Verify response status and data
+    response_data = response.json()
+    assert response.status_code == 400
+    assert response_data == {
+        "message": f"User {user_1.email} has been previously deleted at {user_1.deleted_at.isoformat()}.",
+    }
+
+
+@pytest.mark.integration()
 def test_delete_user_with_a_user_id_which_does_not_match_any_users_fails(
     fastapi_test_client: TestClient,
     db_session: Session,
@@ -418,6 +445,3 @@ def test_delete_user_with_a_user_id_which_does_not_match_any_users_fails(
     response_data = response.json()
     assert response.status_code == 400
     assert response_data == {"message": f"User id {random_user_id} does not exist."}
-
-
-# @todo add an integration test for deleting a user that's already been deleted

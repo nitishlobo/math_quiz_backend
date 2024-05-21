@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from v1.database.models.test_factories.users import UserFactory
 from v1.database.models.users import User
+from v1.exceptions.users import UserHasBeenPreviouslyDeletedError
 from v1.schemas.users import CreateUserRequest, CreateUserService, UpdateUserService
 from v1.services.users import (
     create_user,
@@ -275,7 +276,7 @@ def test_soft_delete_user(db_session: Session):
     datetime_before_request = datetime.now(timezone.utc) - timedelta(minutes=1)
 
     # When
-    soft_delete_user(db_session, user.id_)
+    soft_delete_user(db_session, user)
     datetime_after_request = datetime.now(timezone.utc) + timedelta(minutes=1)
 
     # Then
@@ -294,3 +295,21 @@ def test_soft_delete_user(db_session: Session):
     assert db_user.deleted_at is not None
     assert db_user.deleted_at > datetime_before_request
     assert db_user.deleted_at < datetime_after_request
+
+
+def test_soft_delete_user_who_has_been_previously_deleted_fails(db_session: Session):
+    """Test soft deleting a user who has been previously deleted fails."""
+    # Given
+    user_deleted_at = datetime(2009, 1, 27, 3, 4, 52, 63870, tzinfo=timezone.utc)
+    user = UserFactory(first_name="Mary", last_name="Magdela", is_superuser=False, deleted_at=user_deleted_at)
+    db_session.commit()
+
+    # When
+    with pytest.raises(UserHasBeenPreviouslyDeletedError):
+        soft_delete_user(db_session, user)
+
+    # Then
+    db_user = db_session.get(User, user.id_)
+    # Verify fields on user deletion time has not changed
+    assert db_user is not None
+    assert db_user.deleted_at == user_deleted_at

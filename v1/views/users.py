@@ -49,5 +49,5 @@ def update_user(db_session: DbSession, user: UserDependency, update_user_data: U
 @router.delete("/{user_id}", response_model=DeleteResponse)
 def soft_delete_user(db_session: DbSession, user: UserDependency) -> DeleteResponse:
     """Return success message on delete."""
-    users_service.soft_delete_user(db_session, user_id=user.id_)
+    users_service.soft_delete_user(db_session, user)
     return DeleteResponse()
