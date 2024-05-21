@@ -41,7 +41,7 @@ def update_user(db_session: DbSession, user: UserDependency, update_user_data: U
     """Return updated user."""
     users_service.update_user(
         db_session,
-        user,
+        user_id=user.id_,
         update_user_data=UpdateUserService(**update_user_data.model_dump(exclude_unset=True)),
     )
     return users_service.get_user_from_id(db_session, user_id=user.id_)
@@ -52,7 +52,7 @@ def soft_delete_user(db_session: DbSession, user: UserDependency) -> DeleteRespo
     """Return success message on delete."""
     users_service.update_user(
         db_session,
-        user,
+        user_id=user.id_,
         update_user_data=UpdateUserService(deleted_at=datetime.now(timezone.utc)),
     )
     return DeleteResponse()
