@@ -1,7 +1,6 @@
 """User endpoints."""
 
 from collections.abc import Sequence
-from datetime import datetime, timezone
 from http import HTTPStatus
 
 from v1.database.models.users import User
@@ -50,9 +49,5 @@ def update_user(db_session: DbSession, user: UserDependency, update_user_data: U
 @router.delete("/{user_id}", response_model=DeleteResponse)
 def soft_delete_user(db_session: DbSession, user: UserDependency) -> DeleteResponse:
     """Return success message on delete."""
-    users_service.update_user(
-        db_session,
-        user_id=user.id_,
-        update_user_data=UpdateUserService(deleted_at=datetime.now(timezone.utc)),
-    )
+    users_service.soft_delete_user(db_session, user_id=user.id_)
     return DeleteResponse()

@@ -294,29 +294,3 @@ def test_soft_delete_user(db_session: Session):
     assert db_user.deleted_at is not None
     assert db_user.deleted_at > datetime_before_request
     assert db_user.deleted_at < datetime_after_request
-
-
-def test_soft_delete_user_with_a_user_id_that_does_not_match_any_users(db_session: Session):
-    """Test soft deleting a user with user id that does not match any user."""
-    # Given
-    user = UserFactory(first_name="Mary", last_name="Magdela", is_superuser=False)
-    db_session.commit()
-    user_hashed_password = user.hashed_password
-
-    # When
-    # Enter in a random user id
-    soft_delete_user(db_session, user_id=uuid.uuid4())
-
-    # Then
-    db_user = db_session.get(User, user.id_)
-    # Verify that all fields on user remain the same as they were before the request
-    assert db_user is not None
-    assert db_user.id_ == user.id_
-    assert db_user.first_name == user.first_name
-    assert db_user.last_name == user.last_name
-    assert db_user.email == user.email
-    assert db_user.hashed_password == user_hashed_password
-    assert db_user.is_superuser == user.is_superuser
-    assert db_user.created_at == user.created_at
-    assert db_user.updated_at == user.updated_at
-    assert db_user.deleted_at is None

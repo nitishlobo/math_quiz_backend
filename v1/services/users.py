@@ -48,7 +48,6 @@ def update_user(db_session: Session, user_id: UUID, update_user_data: UpdateUser
     db_session.commit()
 
 
-# @todo delete this function as we now user update_user
 def soft_delete_user(db_session: Session, user_id: UUID) -> None:
     """Soft delete a user using user id."""
-    db_session.execute(update(User).where(User.id_ == user_id).values(deleted_at=datetime.now(timezone.utc)))
+    update_user(db_session, user_id, update_user_data=UpdateUserService(deleted_at=datetime.now(timezone.utc)))
