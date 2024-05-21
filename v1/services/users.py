@@ -38,7 +38,7 @@ def get_users(db_session: Session, offset: int = 0, limit: int = 100) -> Sequenc
     ).all()
 
 
-def update_user(db_session: Session, user_id: UUID, update_user_data: UpdateUserService) -> None:
+def update_user_using_id(db_session: Session, user_id: UUID, update_user_data: UpdateUserService) -> None:
     """Update user."""
     update_user_dict = update_user_data.model_dump(exclude={"password"}, exclude_unset=True)
     if update_user_data.password:
@@ -50,4 +50,4 @@ def update_user(db_session: Session, user_id: UUID, update_user_data: UpdateUser
 
 def soft_delete_user(db_session: Session, user_id: UUID) -> None:
     """Soft delete a user using user id."""
-    update_user(db_session, user_id, update_user_data=UpdateUserService(deleted_at=datetime.now(timezone.utc)))
+    update_user_using_id(db_session, user_id, update_user_data=UpdateUserService(deleted_at=datetime.now(timezone.utc)))

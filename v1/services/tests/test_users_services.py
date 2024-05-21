@@ -18,7 +18,7 @@ from v1.services.users import (
     get_user_from_id,
     get_users,
     soft_delete_user,
-    update_user,
+    update_user_using_id,
 )
 
 
@@ -213,9 +213,9 @@ def test_update_user(db_session: Session):  # pylint: disable=too-many-statement
     user_1_update = UpdateUserService(last_name="Salvae", is_superuser=True)
     user_2_update = UpdateUserService(email="flora123solace@yahoo.com")
     user_3_update = UpdateUserService(password="MySuperCoolPassword@789!!")
-    update_user(db_session, user_id=user_1.id_, update_user_data=user_1_update)
-    update_user(db_session, user_id=user_2.id_, update_user_data=user_2_update)
-    update_user(db_session, user_id=user_3.id_, update_user_data=user_3_update)
+    update_user_using_id(db_session, user_id=user_1.id_, update_user_data=user_1_update)
+    update_user_using_id(db_session, user_id=user_2.id_, update_user_data=user_2_update)
+    update_user_using_id(db_session, user_id=user_3.id_, update_user_data=user_3_update)
     datetime_after_request = datetime.now(timezone.utc) + timedelta(minutes=1)
 
     # Then
