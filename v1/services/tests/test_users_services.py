@@ -17,7 +17,7 @@ from v1.services.users import (
     get_user_from_email,
     get_user_from_id,
     get_users,
-    soft_delete_user,
+    soft_delete_user_using_id,
     update_user_using_id,
 )
 
@@ -275,7 +275,7 @@ def test_soft_delete_user(db_session: Session):
     datetime_before_request = datetime.now(timezone.utc) - timedelta(minutes=1)
 
     # When
-    soft_delete_user(db_session, user.id_)
+    soft_delete_user_using_id(db_session, user.id_)
     datetime_after_request = datetime.now(timezone.utc) + timedelta(minutes=1)
 
     # Then
