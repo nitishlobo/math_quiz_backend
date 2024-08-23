@@ -1,5 +1,5 @@
 default_language_version:
-  python: python3.11
+  python: python3.12
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
@@ -41,8 +41,8 @@ repos:
       - id: name-tests-test
         description: verifies test files are named consistently (i.e. test_filename)
         args: ["--pytest-test-first"]
-      - id: no-commit-to-branch
-        name: protect master/main branches from direct commits
+      # - id: no-commit-to-branch
+      #   name: protect master/main branches from direct commits
       - id: pretty-format-json
         description: sets a standard for formatting json files
         args: ["--autofix"]

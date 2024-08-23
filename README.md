@@ -24,7 +24,7 @@ Instructions are for windows machines but they will be similar for linux and mac
 
 ### Python
 
-#### Python version - `3.11`
+#### Python version - `3.12`
 
 #### Dependencies
 
