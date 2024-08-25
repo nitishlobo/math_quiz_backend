@@ -34,7 +34,7 @@ def test_create_user(db_session: Session, create_user_request: CreateUserRequest
     # Then
     # Verify the user fields
     assert db_user is not None
-    assert db_user.id_ is not None
+    assert db_user.id is not None
     assert db_user.first_name == user.first_name
     assert db_user.last_name == user.last_name
     assert db_user.email == user.email
@@ -54,7 +54,7 @@ def test_get_user_from_id(db_session: Session):
     db_session.commit()
 
     # When
-    db_user = get_user_from_id(db_session, user_id=user.id_)
+    db_user = get_user_from_id(db_session, user_id=user.id)
 
     # Then
     assert db_user is not None
@@ -121,7 +121,7 @@ def test_get_users(db_session: Session):
     UserFactory.create_batch(200)
     db_session.commit()
     expected_users = db_session.scalars(
-        select(User).order_by(User.first_name.asc(), User.last_name.asc(), User.id_.asc()),
+        select(User).order_by(User.first_name.asc(), User.last_name.asc(), User.id.asc()),
     ).all()
     expected_user_list = get_users_as_list_of_dict(expected_users)
 
@@ -214,16 +214,16 @@ def test_update_user(db_session: Session):  # pylint: disable=too-many-statement
     user_1_update = UpdateUserService(last_name="Salvae", is_superuser=True)
     user_2_update = UpdateUserService(email="flora123solace@yahoo.com")
     user_3_update = UpdateUserService(password="MySuperCoolPassword@789!!")
-    update_user_using_id(db_session, user_id=user_1.id_, update_user_data=user_1_update)
-    update_user_using_id(db_session, user_id=user_2.id_, update_user_data=user_2_update)
-    update_user_using_id(db_session, user_id=user_3.id_, update_user_data=user_3_update)
+    update_user_using_id(db_session, user_id=user_1.id, update_user_data=user_1_update)
+    update_user_using_id(db_session, user_id=user_2.id, update_user_data=user_2_update)
+    update_user_using_id(db_session, user_id=user_3.id, update_user_data=user_3_update)
     datetime_after_request = datetime.now(timezone.utc) + timedelta(minutes=1)
 
     # Then
     # Verify fields on user 1 that should not be changed
-    db_user_1 = db_session.get(User, user_1.id_)
+    db_user_1 = db_session.get(User, user_1.id)
     assert db_user_1 is not None
-    assert db_user_1.id_ == user_1.id_
+    assert db_user_1.id == user_1.id
     assert db_user_1.first_name == user_1.first_name
     assert db_user_1.email == user_1.email
     assert db_user_1.hashed_password == user_1_hashed_password
@@ -236,9 +236,9 @@ def test_update_user(db_session: Session):  # pylint: disable=too-many-statement
     assert db_user_1.updated_at < datetime_after_request
 
     # Verify fields on user 2 that should not be changed
-    db_user_2 = db_session.get(User, user_2.id_)
+    db_user_2 = db_session.get(User, user_2.id)
     assert db_user_2 is not None
-    assert db_user_2.id_ == user_2.id_
+    assert db_user_2.id == user_2.id
     assert db_user_2.first_name == user_2.first_name
     assert db_user_2.last_name == user_2.last_name
     assert db_user_2.hashed_password == user_2_hashed_password
@@ -251,9 +251,9 @@ def test_update_user(db_session: Session):  # pylint: disable=too-many-statement
     assert db_user_2.updated_at < datetime_after_request
 
     # Verify fields on user 3 that should not be changed
-    db_user_3 = db_session.get(User, user_3.id_)
+    db_user_3 = db_session.get(User, user_3.id)
     assert db_user_3 is not None
-    assert db_user_3.id_ == user_3.id_
+    assert db_user_3.id == user_3.id
     assert db_user_3.first_name == user_3.first_name
     assert db_user_3.last_name == user_3.last_name
     assert db_user_3.email == user_3.email
@@ -280,10 +280,10 @@ def test_soft_delete_user(db_session: Session):
     datetime_after_request = datetime.now(timezone.utc) + timedelta(minutes=1)
 
     # Then
-    db_user = db_session.get(User, user.id_)
+    db_user = db_session.get(User, user.id)
     # Verify fields on user that should not be changed
     assert db_user is not None
-    assert db_user.id_ == user.id_
+    assert db_user.id == user.id
     assert db_user.first_name == user.first_name
     assert db_user.last_name == user.last_name
     assert db_user.email == user.email
@@ -309,7 +309,7 @@ def test_soft_delete_user_who_has_been_previously_deleted_fails(db_session: Sess
         soft_delete_user(db_session, user)
 
     # Then
-    db_user = db_session.get(User, user.id_)
+    db_user = db_session.get(User, user.id)
     # Verify fields on user deletion time has not changed
     assert db_user is not None
     assert db_user.deleted_at == user_deleted_at

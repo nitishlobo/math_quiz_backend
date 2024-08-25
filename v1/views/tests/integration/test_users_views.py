@@ -69,7 +69,7 @@ def test_create_user(fastapi_test_client: TestClient, db_session: Session, creat
     assert response_data["deleted_at"] is None
 
     # Verify information recorded in database is correct
-    db_user = db_session.query(User).filter_by(id_=response_data["id"]).first()
+    db_user = db_session.query(User).filter_by(id=response_data["id"]).first()
     assert db_user is not None
     assert db_user.first_name == create_user_request.first_name
     assert db_user.last_name == create_user_request.last_name
@@ -170,7 +170,7 @@ def test_read_users(fastapi_test_client: TestClient, db_session: Session):
             "deleted_at": user_1.deleted_at,
             "email": user_1.email,
             "first_name": user_1.first_name,
-            "id": str(user_1.id_),
+            "id": str(user_1.id),
             "is_superuser": user_1.is_superuser,
             "last_name": user_1.last_name,
             "updated_at": datetime_obj_to_str(user_1.updated_at),
@@ -180,7 +180,7 @@ def test_read_users(fastapi_test_client: TestClient, db_session: Session):
             "deleted_at": user_2.deleted_at,
             "email": user_2.email,
             "first_name": "Fulton",
-            "id": str(user_2.id_),
+            "id": str(user_2.id),
             "is_superuser": True,
             "last_name": "Sheen",
             "updated_at": datetime_obj_to_str(user_2.updated_at),
@@ -190,7 +190,7 @@ def test_read_users(fastapi_test_client: TestClient, db_session: Session):
             "deleted_at": user_3.deleted_at,
             "email": user_3.email,
             "first_name": "John",
-            "id": str(user_3.id_),
+            "id": str(user_3.id),
             "is_superuser": user_3.is_superuser,
             "last_name": "Tolkien",
             "updated_at": datetime_obj_to_str(user_3.updated_at),
@@ -214,7 +214,7 @@ def test_read_user(fastapi_test_client: TestClient, db_session: Session):
     db_session.commit()
 
     # When
-    response = fastapi_test_client.get(f"{v1_router.prefix}/users/{user_2.id_}")
+    response = fastapi_test_client.get(f"{v1_router.prefix}/users/{user_2.id}")
 
     # Then
     # Verify response status and data
@@ -225,7 +225,7 @@ def test_read_user(fastapi_test_client: TestClient, db_session: Session):
         "deleted_at": user_2.deleted_at,
         "email": user_2.email,
         "first_name": "Fulton",
-        "id": str(user_2.id_),
+        "id": str(user_2.id),
         "is_superuser": True,
         "last_name": "Sheen",
         "updated_at": datetime_obj_to_str(user_2.updated_at),
@@ -274,7 +274,7 @@ def test_update_user(fastapi_test_client: TestClient, db_session: Session):
 
     # When
     response = fastapi_test_client.patch(
-        f"{v1_router.prefix}/users/{user_3.id_}",
+        f"{v1_router.prefix}/users/{user_3.id}",
         json={"first_name": "Jonathan", "is_superuser": True, "password": "MyStronglyFakePassword@!"},
     )
 
@@ -287,7 +287,7 @@ def test_update_user(fastapi_test_client: TestClient, db_session: Session):
         "deleted_at": user_3.deleted_at,
         "email": user_3.email,
         "first_name": "Jonathan",
-        "id": str(user_3.id_),
+        "id": str(user_3.id),
         "is_superuser": True,
         "last_name": "Tolkien",
         # updated_at should reflect a new time after being updated.
@@ -299,13 +299,13 @@ def test_update_user(fastapi_test_client: TestClient, db_session: Session):
 
     # Map database users for verifying data
     db_users = db_session.scalars(select(User)).all()
-    db_user_id_to_user_map = {user.id_: user.to_dict() for user in db_users}
+    db_user_id_to_user_map = {user.id: user.to_dict() for user in db_users}
     # Verify password is changed
-    assert db_user_id_to_user_map[user_3.id_]["hashed_password"] != user_3_hashed_password
+    assert db_user_id_to_user_map[user_3.id]["hashed_password"] != user_3_hashed_password
 
     # Verify that user_1 and user_2 data remains the same as before the request
-    assert db_user_id_to_user_map[user_1.id_] == user_1.to_dict()
-    assert db_user_id_to_user_map[user_2.id_] == user_2.to_dict()
+    assert db_user_id_to_user_map[user_1.id] == user_1.to_dict()
+    assert db_user_id_to_user_map[user_2.id] == user_2.to_dict()
 
 
 @pytest.mark.integration()
@@ -346,7 +346,7 @@ def test_update_user_with_an_invalid_email_address_fails(fastapi_test_client: Te
 
     # When
     response = fastapi_test_client.patch(
-        f"{v1_router.prefix}/users/{user.id_}",
+        f"{v1_router.prefix}/users/{user.id}",
         json={"email": "fulton.sheen@elpaso-university.com"},
     )
 
@@ -369,7 +369,7 @@ def test_delete_user(fastapi_test_client: TestClient, db_session: Session):
     datetime_before_request = datetime.now(timezone.utc) - timedelta(minutes=1)
 
     # When
-    response = fastapi_test_client.delete(f"{v1_router.prefix}/users/{user_1.id_}")
+    response = fastapi_test_client.delete(f"{v1_router.prefix}/users/{user_1.id}")
     datetime_after_request = datetime.now(timezone.utc) + timedelta(minutes=1)
 
     # Then
@@ -383,15 +383,15 @@ def test_delete_user(fastapi_test_client: TestClient, db_session: Session):
     assert len(db_users) == 3
 
     # Verify that user 1 was deleted
-    db_user_id_to_user_map = {user.id_: user.to_dict() for user in db_users}
-    user_1_deleted_at = db_user_id_to_user_map[user_1.id_]["deleted_at"]
+    db_user_id_to_user_map = {user.id: user.to_dict() for user in db_users}
+    user_1_deleted_at = db_user_id_to_user_map[user_1.id]["deleted_at"]
     assert user_1_deleted_at is not None
     assert user_1_deleted_at > datetime_before_request
     assert user_1_deleted_at < datetime_after_request
 
     # Verify that the user 2 and 3 are not deleted
-    assert db_user_id_to_user_map[user_2.id_]["deleted_at"] is None
-    assert db_user_id_to_user_map[user_3.id_]["deleted_at"] is None
+    assert db_user_id_to_user_map[user_2.id]["deleted_at"] is None
+    assert db_user_id_to_user_map[user_3.id]["deleted_at"] is None
 
 
 @pytest.mark.integration()
@@ -410,7 +410,7 @@ def test_delete_user_who_has_been_previously_deleted_fails(
     db_session.commit()
 
     # When
-    response = fastapi_test_client.delete(f"{v1_router.prefix}/users/{user_1.id_}")
+    response = fastapi_test_client.delete(f"{v1_router.prefix}/users/{user_1.id}")
 
     # Then
     # Verify response status and data

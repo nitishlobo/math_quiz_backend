@@ -56,7 +56,7 @@ class UserResponse(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True)
 
-    id_: UUID = Field(alias="id")
+    id: UUID = Field(alias="id")
     first_name: str
     last_name: str
     email: str

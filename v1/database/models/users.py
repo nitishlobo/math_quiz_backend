@@ -11,7 +11,7 @@ class User(SqlAlchemyBase, TimeAudit):
 
     __tablename__ = "users"
 
-    id_: Mapped[ColumnTypes.id_pk] = mapped_column(name="id")
+    id: Mapped[ColumnTypes.id_pk]
     first_name: Mapped[str]
     last_name: Mapped[str]
     email: Mapped[str] = mapped_column(unique=True, index=True)

@@ -20,7 +20,7 @@ async def user_id_does_not_exist_exception_handler(_request: Request, exc: UserI
     """Return 400 when user id does not exists."""
     return JSONResponse(
         status_code=HTTPStatus.BAD_REQUEST,
-        content={"message": f"User id {exc.id_!s} does not exist."},
+        content={"message": f"User id {exc.id!s} does not exist."},
     )
 
 

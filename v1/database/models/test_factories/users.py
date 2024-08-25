@@ -19,11 +19,11 @@ class UserFactory(BaseFactory):
         model = User
         exclude = ("password",)
 
-    id_ = factory.Faker("uuid4")
+    id = factory.Faker("uuid4")
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
     email = factory.LazyAttribute(
-        lambda obj: f"{obj.first_name.lower()}.{obj.last_name.lower()}.{str(obj.id_).replace('-', '')}@gmail.com",
+        lambda obj: f"{obj.first_name.lower()}.{obj.last_name.lower()}.{str(obj.id).replace('-', '')}@gmail.com",
     )
     hashed_password = factory.LazyAttribute(lambda obj: PasswordHasher().hash(obj.password))
     is_superuser = False

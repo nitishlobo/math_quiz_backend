@@ -17,9 +17,9 @@ class UserAlreadyExistsError(BaseError):
 class UserIdDoesNotExistError(BaseError):
     """Raise error when user id does not exist in the database."""
 
-    def __init__(self, id_: UUID) -> None:
+    def __init__(self, id: UUID) -> None:
         """User id."""
-        self.id_ = id_
+        self.id = id
 
 
 class UserHasBeenPreviouslyDeletedError(BaseError):

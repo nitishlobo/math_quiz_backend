@@ -15,7 +15,7 @@ def get_user_parameter_from_user_id(db_session: DbSession, user_id: UUID) -> Use
     """Get user object from user id."""
     user = users_service.get_user_from_id(db_session, user_id)
     if user is None:
-        raise UserIdDoesNotExistError(id_=user_id)
+        raise UserIdDoesNotExistError(id=user_id)
     return user
 
 

@@ -40,10 +40,10 @@ def update_user(db_session: DbSession, user: UserDependency, update_user_data: U
     """Return updated user."""
     users_service.update_user_using_id(
         db_session,
-        user_id=user.id_,
+        user_id=user.id,
         update_user_data=UpdateUserService(**update_user_data.model_dump(exclude_unset=True)),
     )
-    return users_service.get_user_from_id(db_session, user_id=user.id_)
+    return users_service.get_user_from_id(db_session, user_id=user.id)
 
 
 @router.delete("/{user_id}", response_model=DeleteResponse)

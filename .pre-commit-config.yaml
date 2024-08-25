@@ -113,9 +113,12 @@ repos:
         description: finds common security issues in Python code
         args: ["-c", "pyproject.toml"]
         additional_dependencies: ["bandit[toml]"]
-  - repo: https://github.com/pycqa/pylint
-    rev: v3.2.0
+  - repo: local
     hooks:
-      - id: pylint
+    -   id: pylint
+        name: pylint
+        entry: pylint
         description: static code analyser - checks for errors, code smells, enforce coding standard, and make suggestions about refactoring code
-        additional_dependencies: ["pylint-pydantic"]
+        language: system
+        types: [python]
+        require_serial: true
