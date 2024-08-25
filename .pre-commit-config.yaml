@@ -74,7 +74,7 @@ repos:
       - id: text-unicode-replacement-char
         description: forbids files which have a UTF-8 Unicode replacement character
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.15.2
+    rev: v3.17.0
     hooks:
       - id: pyupgrade
         description: automatically upgrades syntax as per newer python versions
@@ -85,7 +85,7 @@ repos:
       - id: autopep8
         description: automatically formats code to conform to the PEP 8 style guide
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.4.4"
+    rev: "v0.6.2"
     hooks:
       - id: ruff
         description: collection of several linting plugins (isort, flake8, mccabe, etc...)
@@ -97,7 +97,7 @@ repos:
   #     -   id: mypy
   #         description: static type checker for python
   - repo: https://github.com/psf/black
-    rev: 24.4.2
+    rev: 24.8.0
     hooks:
       - id: black
         description: opinionated code formatter
@@ -107,7 +107,7 @@ repos:
       - id: setup-cfg-fmt
         description: applies consistent format to `setup.cfg` files
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.8
+    rev: 1.7.9
     hooks:
       - id: bandit
         description: finds common security issues in Python code
